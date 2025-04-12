@@ -1,0 +1,17 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=PyCharm
+
+
+### Criar usuário
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+  "username": "araujofj",
+  "password": "12345678"
+}
+
+
+### Listar usuários
+GET http://localhost:5000/auth/register
