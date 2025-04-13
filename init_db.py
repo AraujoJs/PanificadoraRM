@@ -31,7 +31,17 @@ def main():
 
         db.session.add_all([p1, p2, p3])
         db.session.commit()
+
         print("Itens adicionados!")
+
+        db.session.query(User).delete()
+        u1 = User(name="João", email="joão@gmail.com", password="12345678", role="admin")
+        u2 = User(name="Maria", email="maria@gmail.com", password="87654321", role="user")
+
+        db.session.add_all([u1, u2])
+        db.session.commit()
+
+        print("Usuarios adicionados!")
 
 if __name__ == '__main__':
     main()

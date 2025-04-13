@@ -3,7 +3,7 @@ GET https://examples.http-client.intellij.net/get
     ?generated-in=PyCharm
 
 
-### Criar usuário
+### Adicionar produto na API
 POST http://localhost:5000/api/v1/products
 Content-Type: application/json
 
@@ -13,6 +13,23 @@ Content-Type: application/json
   "stock": 90
 }
 
+### Login na sessão
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "joão@gmail.com",
+  "password": "12345678"
+}
+
+### LISTAR PRODUTOS (com token de autenticação)
+# @no-cookie-jar
+GET http://localhost:5000/api/v1/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NTY1OTI0fQ.odVxaFAeTDrYZjbhje8A6w-_lsmwtZpq1aYiwJBqWPs
+
+### Logout usuario!
+GET http://localhost:5000/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NTY1OTI0fQ.odVxaFAeTDrYZjbhje8A6w-_lsmwtZpq1aYiwJBqWPs
 
 ### Listar usuários
 GET http://localhost:5000/auth/register

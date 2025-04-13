@@ -3,7 +3,7 @@
 Script: PanificadoraRM/__init__
 Création: jojo, le 11/04/2025
 """
-from flask import Flask
+from flask import Flask, session
 from dotenv import load_dotenv
 from app.extensions import db
 import os
@@ -11,15 +11,17 @@ import os
 # Carrega variáveis do arquivo .env
 load_dotenv()
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 def create_app():
     app = Flask(__name__)
+    app.secret_key = SECRET_KEY
     app.config.from_pyfile(os.path.join(os.path.dirname(__file__), 'config.py'))
-
     db.init_app(app)
 
     from app.auth.routes import auth
     from app.produtos.routes import produtos_bp
-    app.register_blueprint(auth)
+    app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(produtos_bp, url_prefix='/api/v1/products')
 
     return app

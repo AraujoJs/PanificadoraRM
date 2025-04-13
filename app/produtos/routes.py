@@ -10,6 +10,7 @@ from flask import Blueprint, jsonify, request
 from flask.globals import request_ctx
 from app.extensions import db
 from app.produtos.models import Product
+from utils.auth import token_required
 # Imports
 
 
@@ -17,8 +18,12 @@ from app.produtos.models import Product
 produtos_bp = Blueprint('produtos_bp', __name__)
 
 @produtos_bp.route('/', methods=('GET', 'POST'))
-def listar_produtos():
+@token_required
+def listar_produtos(current_user):
     if request.method == 'POST':
+        if current_user.role != 'admin':
+            return jsonify({'message': 'Acesso negado'}), 403
+
         try:
             data = request.get_json()
             name = data.get('name')
