@@ -3,22 +3,22 @@
 Script: Backend/models
 Création: jojo, le 12/04/2025
 """
+import uuid
 
+from sqlalchemy import UUID
 
 # Imports
 
+from app.extensions import db
 
-# Configurations globales
+class User(db.Model):
+    __tablename__ = 'users'
 
+    user_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, unique=True, nullable=False)
+    password = db.Column(db.Text, nullable=False)
+    role = db.Column(db.Text, nullable=False)
 
-# Fonctions
-
-
-# Programme principal
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
-# Fin
+    sales = db.relationship('Sale', backref='user', lazy=True)
+    sale_items = db.relationship('SaleItem', backref='user', lazy=True)

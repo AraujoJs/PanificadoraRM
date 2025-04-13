@@ -12,8 +12,9 @@ from app.extensions import db
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-
-# Fonctions
+from app.produtos.models import Product
+from app.vendas.models import Sale, SaleItem
+from app.auth.models import User
 
 # Programme principal
 def main():

@@ -8,7 +8,6 @@ Création: jojo, le 11/04/2025
 # Imports
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, flash, g
 from app.extensions import db
-from app.models import Usuario
 
 from werkzeug.security import check_password_hash, generate_password_hash
 

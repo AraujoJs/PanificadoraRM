@@ -9,7 +9,7 @@ Création: jojo, le 12/04/2025
 # Imports
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, flash, g, session
 from app.extensions import db
-from app.models import Usuario
+from app.auth.models import User
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -18,31 +18,33 @@ auth = Blueprint('auth', __name__, url_prefix='/auth', template_folder='template
 
 @auth.route('/register', methods=('GET', 'POST'))
 def register():
-    if request.method == 'POST':
-        dados = request.get_json()
-        username = dados['username']
-        password = dados['password']
-        error = None
-
-        if not username:
-            error = "Username is required."
-        elif not password:
-            error = "Password is required."
-
-        if error is None:
-            try:
-                db.execute(
-                    "INSERT INTO user (username, password) VALUES(?, ?)",
-                    (username, generate_password_hash(password)),
-                )
-                db.commit()
-            except db.IntegrityError:
-                error = f"User {username} is already registered."
-            else:
-                return redirect(url_for('auth.login'))
-
-        flash(error)
-    return render_template('auth/register.html')
+    usuarios = User.query.all()
+    return jsonify([{"id": u.id, "nome": u.nome} for u in usuarios])
+        # if request.method == 'POST':
+    #     dados = request.get_json()
+    #     username = dados['username']
+    #     password = dados['password']
+    #     error = None
+    #
+    #     if not username:
+    #         error = "Username is required."
+    #     elif not password:
+    #         error = "Password is required."
+    #
+    #     if error is None:
+    #         try:
+    #             db.execute(
+    #                 "INSERT INTO user (username, password) VALUES(?, ?)",
+    #                 (username, generate_password_hash(password)),
+    #             )
+    #             db.commit()
+    #         except db.IntegrityError:
+    #             error = f"User {username} is already registered."
+    #         else:
+    #             return redirect(url_for('auth.login'))
+    #
+    #     flash(error)
+    # return render_template('auth/register.html')
 
 @auth.route('/login', methods=('POST', 'GET'))
 def login():
@@ -73,17 +75,3 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for('index'))
-# Configurations globales
-
-
-# Fonctions
-
-
-# Programme principal
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
-# Fin
