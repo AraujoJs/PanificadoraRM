@@ -23,6 +23,15 @@ def main():
         db.create_all()
         print("Tabelas criadas com sucesso!")
 
+        db.session.query(Product).delete()
+
+        p1 = Product(name="Coxinha", unit_price=5.0, stock=10)
+        p2 = Product(name="Pão Francês", unit_price=1.0, stock=100)
+        p3 = Product(name="Bolo formigueiro", unit_price=15.0, stock=5)
+
+        db.session.add_all([p1, p2, p3])
+        db.session.commit()
+        print("Itens adicionados!")
 
 if __name__ == '__main__':
     main()

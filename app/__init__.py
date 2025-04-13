@@ -18,6 +18,8 @@ def create_app():
     db.init_app(app)
 
     from app.auth.routes import auth
+    from app.produtos.routes import produtos_bp
     app.register_blueprint(auth)
+    app.register_blueprint(produtos_bp, url_prefix='/api/v1/products')
 
     return app
