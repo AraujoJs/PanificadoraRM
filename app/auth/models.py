@@ -6,7 +6,7 @@ Création: jojo, le 12/04/2025
 import uuid
 
 from sqlalchemy import UUID
-from app.vendas.models import Sale, SaleItem
+from app.sales.models import Sale, SaleItem
 # Imports
 
 from app.extensions import db

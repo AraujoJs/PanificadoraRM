@@ -31,7 +31,6 @@ class SaleItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
     subtotal = db.Column(db.Numeric, nullable=False)
-
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.user_id'), nullable=False)
     sale_id = db.Column(UUID(as_uuid=True), db.ForeignKey('sales.sale_id'), nullable=False)
     product_id = db.Column(UUID(as_uuid=True), db.ForeignKey('products.product_id'), nullable=False)
