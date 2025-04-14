@@ -25,7 +25,7 @@ Content-Type: application/json
 ### LISTAR PRODUTOS (com token de autenticação)
 # @no-cookie-jar
 GET http://localhost:5000/api/v1/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NTY1OTI0fQ.odVxaFAeTDrYZjbhje8A6w-_lsmwtZpq1aYiwJBqWPs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NjUwNzI0fQ.zG9an3FHtCnFOGKYXPKKk7tWw9xGV-qtmLKu1z9RZZE
 
 ### Logout usuario!
 GET http://localhost:5000/auth/logout
