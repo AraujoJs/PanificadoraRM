@@ -19,9 +19,9 @@ import pytz
 
 from utils.auth import token_required
 
-auth = Blueprint('auth', __name__, template_folder='templates')
+auth_bp = Blueprint('auth_bp', __name__, template_folder='templates')
 
-@auth.route('/login', methods=('POST', 'GET'))
+@auth_bp.route('/login', methods=('POST', 'GET'))
 def login():
     if request.method == 'POST':
         data = request.get_json()
@@ -32,7 +32,7 @@ def login():
 
         if user and user.check_password(password):
             utc_now = datetime.datetime.now(pytz.utc)
-            exp_time = utc_now + datetime.timedelta(hours=1)
+            exp_time = utc_now + datetime.timedelta(minutes=3)
 
             token = jwt.encode({
                 'user_id': str(user.user_id),
@@ -51,23 +51,24 @@ def login():
 
 
 
-@auth.route('/register', methods=('GET', 'POST'))
+@auth_bp.route('/register', methods=('GET', 'POST'))
 def register():
-    usuarios = User.query.all()
+    users = User.query.all()
     pass
 
 
 
-@auth.route('/logout')
+@auth_bp.route('/logout')
 @token_required
 def logout(current_user):
     session.clear()
     return jsonify({"message": "Logout realizado com sucesso!"}), 200
 
 
-@auth.route('/users')
-def get_users():
+@auth_bp.route('/users')
+# @token_required
+def users():
     usuarios = User.query.all()
     return jsonify(
-        [{"user_id": u.user_id, "name": u.name, "email": u.email, "password": u.password, "role": u.role}
+        [{"user_id": u.user_id, "name": u.name, "email": u.email, "role": u.role}
          for u in usuarios])
