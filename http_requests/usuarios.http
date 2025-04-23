@@ -13,7 +13,7 @@ Content-Type: application/json
   "stock": 90
 }
 
-### Login na sessão
+### Login na sessão admin
 POST http://localhost:5000/auth/login
 Content-Type: application/json
 
@@ -22,14 +22,55 @@ Content-Type: application/json
   "password": "12345678"
 }
 
+### Login na sessão user 1
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "maria@gmail.com",
+  "password": "87654321"
+}
+
+### Login na sessão user 2
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "toto@gmail.com",
+  "password": "11111111"
+}
+
 ### LISTAR PRODUTOS (com token de autenticação)
 # @no-cookie-jar
 GET http://localhost:5000/api/v1/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NjUwNzI0fQ.zG9an3FHtCnFOGKYXPKKk7tWw9xGV-qtmLKu1z9RZZE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmRmOWI3MTgtMWYzNi00MzVhLWIzOWMtODk1YzcyOTg3ZTMyIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU0MTYyMjd9.7uIRpjmaxEZj9jKqv4-oWlPrkecua827LqF_EXseGKo
+
+### LISTAR USUARIOS (com token de autenticação)
+# @no-cookie-jar
+GET http://localhost:5000/api/v1/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmRmOWI3MTgtMWYzNi00MzVhLWIzOWMtODk1YzcyOTg3ZTMyIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU0MTEyMjl9.UQDnzGXgYlSRY7R-5yFfkNgJsismF1C96t9cBCOqe0U
+
+### LISTAR VENDAS DE UM USUÁRIO (com token de autenticação)
+# @no-cookie-jar
+GET http://localhost:5000/api/v1/sales/user/bdf9b718-1f36-435a-b39c-895c72983e55
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1NDI1NDIwfQ.YVo0xGXkUNkAV7vO4iLiZMXCHLBvfX_67C6Z2r9BXaM
+
+### LISTAR TODAS AS VENDAS (com token de autenticação)
+# Se for admin, pode ver todas as vendas, se for user, pode ver apenas as suas vendas
+# @no-cookie-jar
+GET http://localhost:5000/api/v1/sales
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1NDI2MTcwfQ.Sq9oPEUBrLtvzXsYXlrJdvjkHPED9b6DCicIcEigLYA
+
+### LISTAR ITENS VENDIDOS DE UMA VENDA ESPECIFICA (com token de autenticação)
+# @no-cookie-jar
+GET http://localhost:5000/api/v1/sale_items/d51fadea-53c6-44ec-91a8-ab9243f69467
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1NDI2MTcwfQ.Sq9oPEUBrLtvzXsYXlrJdvjkHPED9b6DCicIcEigLYA
+
+
 
 ### Logout usuario!
 GET http://localhost:5000/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ0NTY1OTI0fQ.odVxaFAeTDrYZjbhje8A6w-_lsmwtZpq1aYiwJBqWPs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1NDI0MzQ2fQ.AkgImf0TbzRtcXLUE-Ed1Xk3qBiXCC3zd9swfM3L3uA
 
 ### Listar usuários
 GET http://localhost:5000/auth/register

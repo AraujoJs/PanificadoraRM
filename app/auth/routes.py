@@ -8,6 +8,7 @@ import datetime
 # Imports
 # Imports
 import os
+import uuid
 
 import jwt
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, flash, g, session
@@ -85,3 +86,8 @@ def users():
     return jsonify(
         [{"user_id": u.user_id, "name": u.name, "email": u.email, "role": u.role}
          for u in usuarios])
+
+
+def get_user_name_by_id(user_id):
+    user = User.query.filter_by(user_id = uuid.UUID(user_id)).first()
+    return user.name
