@@ -20,10 +20,13 @@ def create_app():
     db.init_app(app)
 
     from app.auth.routes import auth_bp
+    from app.auth.routes import users_bp
     from app.products.routes import products_bp
     from app.sales.routes import sales_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(users_bp, url_prefix="/api/v1/users")
+
     app.register_blueprint(products_bp, url_prefix='/api/v1/products')
     app.register_blueprint(sales_bp, url_prefix='/api/v1/sales')
 

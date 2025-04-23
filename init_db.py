@@ -32,6 +32,8 @@ def main():
         print("Tabelas criadas com sucesso!")
 
         db.session.query(Product).delete()
+        db.session.commit()
+
 
         p1 = Product(name="Coxinha", unit_price=5.0, stock=10)
         p2 = Product(name="Pão Francês", unit_price=1.0, stock=100)
@@ -78,11 +80,9 @@ def main():
             print("Venda adicionada!")
 
 
-            product = Product.query.filter_by(name="Coxinha").first()
-            product_2 = Product.query.filter_by(name="Bolo formigueiro").first()
 
-            i1 = SaleItem(quantity=5, subtotal=5.0, user_id=user_id, sale_id=sale_id, product_id=product.product_id)
-            i2 = SaleItem(quantity=6, subtotal=6.0, user_id=user_id, sale_id=sale_id, product_id=product_2.product_id)
+            i1 = SaleItem(quantity=5, subtotal=5.0, user_id=user_id, sale_id=sale_id, product_id=p1.product_id)
+            i2 = SaleItem(quantity=6, subtotal=6.0, user_id=user_id, sale_id=sale_id, product_id=p2.product_id)
 
             db.session.add_all([i1, i2])
             db.session.commit()

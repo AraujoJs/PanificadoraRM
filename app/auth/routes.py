@@ -20,6 +20,19 @@ import pytz
 from utils.auth import token_required
 
 auth_bp = Blueprint('auth_bp', __name__, template_folder='templates')
+users_bp = Blueprint('user_bp', __name__, template_folder='templates')
+
+@users_bp.route('/')
+@token_required
+def users(current_user):
+    if current_user.role == 'admin':
+        users = User.query.all()
+        return jsonify([{"user_id": u.user_id, "name": u.name, "email": u.email, "role": u.role} for u in users])
+    else:
+        user = User.query.filter_by(user_id=current_user.user_id).first()
+        if user is None:
+            return jsonify({"error": "User not found."}), 404
+        return jsonify({"user_id": user.user_id, "name": user.name, "email": user.email, "role": user.role})
 
 @auth_bp.route('/login', methods=('POST', 'GET'))
 def login():
@@ -32,7 +45,7 @@ def login():
 
         if user and user.check_password(password):
             utc_now = datetime.datetime.now(pytz.utc)
-            exp_time = utc_now + datetime.timedelta(minutes=3)
+            exp_time = utc_now + datetime.timedelta(hours=2)
 
             token = jwt.encode({
                 'user_id': str(user.user_id),
