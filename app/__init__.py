@@ -23,11 +23,13 @@ def create_app():
     from app.auth.routes import users_bp
     from app.products.routes import products_bp
     from app.sales.routes import sales_bp
+    from app.sales.routes import sale_items_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(users_bp, url_prefix="/api/v1/users")
 
     app.register_blueprint(products_bp, url_prefix='/api/v1/products')
     app.register_blueprint(sales_bp, url_prefix='/api/v1/sales')
+    app.register_blueprint(sale_items_bp, url_prefix='/api/v1/sale_items')
 
     return app

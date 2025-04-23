@@ -18,8 +18,8 @@ class Sale(db.Model):
 
     sale_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     sale_datetime = db.Column(db.DateTime, default=datetime.now())
-    total = db.Column(db.Numeric, nullable=False)
-    payment_method = db.Column(db.Text, nullable=False)
+    total = db.Column(db.Numeric, nullable=True)
+    payment_method = db.Column(db.Text, nullable=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.user_id'), nullable=False)
 
     sale_items = db.relationship('SaleItem', backref='sale', lazy=True)
@@ -28,7 +28,7 @@ class Sale(db.Model):
 class SaleItem(db.Model):
     __tablename__ = 'sale_items'
 
-    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     quantity = db.Column(db.Integer, nullable=False)
     subtotal = db.Column(db.Numeric, nullable=False)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.user_id'), nullable=False)
