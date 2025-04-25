@@ -35,6 +35,11 @@ def users(current_user):
             return jsonify({"error": "User not found."}), 404
         return jsonify({"user_id": user.user_id, "name": user.name, "email": user.email, "role": user.role})
 
+@auth_bp.route('/login/indentify')
+def login_indentify():
+    return render_template('login_indentify.html')
+
+
 @auth_bp.route('/login', methods=('POST', 'GET'))
 def login():
     if request.method == 'POST':
@@ -60,7 +65,7 @@ def login():
 
         return jsonify({'message': 'Credenciais inválidas.'}), 401
     elif request.method == 'GET':
-        return render_template('auth/login.html')
+        return render_template('login.html')
     return jsonify({'message': 'Método não permitido.'}), 405
 
 
@@ -68,7 +73,7 @@ def login():
 @auth_bp.route('/register', methods=('GET', 'POST'))
 def register():
     users = User.query.all()
-    pass
+    return render_template('register.html')
 
 
 

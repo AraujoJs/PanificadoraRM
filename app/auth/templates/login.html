@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Panificadora-RM</title>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Entrar</h2>
+        <form method="POST" action="{{ url_for('auth_bp.login') }}">
+            <input type="text" name="username" placeholder="Usuário" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <button class="button-send" type="submit">Entrar</button>
+        </form>
+        <div class="links">
+            <a href="{{ url_for('auth_bp.login_indentify') }}">Esqueci a senha</a>
+            <span> | </span>
+            <span>Não tem conta? </span><a href="{{ url_for('auth_bp.register') }}">Cadastre-se</a>
+        </div>
+    </div>
+</body>
+</html>

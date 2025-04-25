@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+    <link rel="stylesheet" href=" {{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Registro</h2>
+    <form action="{{ url_for('auth_bp.register') }}" method="post">
+      <input type="text" name="name" placeholder="Nome completo" required>
+      <input type="email" name="email" placeholder="E-mail" required>
+      <input type="password" name="password" placeholder="Senha" required>
+      <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
+      <input class="button-send" type="submit" value="Registrar">
+    </form>
+    <div class="links">
+      Já tem uma conta? <a href="{{ url_for('auth_bp.login') }}">Faça login</a>
+    </div>
+  </div>
+
+</body>
+</html>
