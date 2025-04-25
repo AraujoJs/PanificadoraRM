@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block main %}
+    <h2>Lista de vendas</h2>
+    <table style="font-size: 80%">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Horário</th>
+            <th>total</th>
+            <th>Metodo de pagamento</th>
+            <th>Vendedor</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for sale in sales %}
+            <tr>
+                <td>
+                    {{ sale.sale_id }}
+                </td>
+                <td>
+                    {{ sale.sale_datetime.strftime('%d/%m/%Y %H:%M:%S') }}
+                </td>
+                <td>
+                    {{ "%.2f" | format(sale.total) }} R$
+                </td>
+                <td>
+                    {{ sale.payment_method }}
+                </td>
+                <td>
+                    {{ sale.user_name }}
+                </td>
+
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}

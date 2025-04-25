@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block main %}
+    <h2>Itens vendidos</h2>
+    <table style="font-size: 80%">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Quantidade</th>
+            <th>Sub-total</th>
+            <th>Usuario</th>
+            <th>Id da Venda</th>
+            <th>Produto</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for item in items %}
+            <tr>
+                <td>
+                    {{ item.item_id }}
+                </td>
+                <td>
+                    {{ item.quantity }}
+                </td>
+                <td>
+                    {{ "%.2f" | format(item.subtotal) }} R$
+                </td>
+                <td>
+                    {{ item.user_name }}
+                </td>
+                <td>
+                    {{ item.sale_id }}
+                </td>
+                <td>
+                    {{ item.product_name }}
+                </td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}

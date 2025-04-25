@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block main %}
+    <h2>Usuarios</h2>
+    <table style="font-size: 80%">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Cargo</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for user in users %}
+            <tr>
+                <td>
+                    {{ user.user_id }}
+                </td>
+                <td>
+                    {{ user.name }}
+                </td>
+                <td>
+                    {{ user.email }}
+                </td>
+                <td>
+                    {{ user.role }}
+                </td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}
