@@ -13,10 +13,10 @@
     <div class="flash {{ category }}">{{ message }}</div>
 {% endfor %}
 <nav>
-    <a href="{{ url_for('home.home') }}">Vendas</a>
-    <a href="#">Produtos</a>
-    <a href="#">Itens Vendidos</a>
-    <a href="#">Usuarios</a>
+    <a href="{{ url_for('home.sales') }}">Vendas</a>
+    <a href="{{ url_for('home.products') }}">Produtos</a>
+    <a href="{{ url_for('home.sale_item') }}">Itens Vendidos</a>
+    <a href="{{ url_for('home.users') }}">Usuarios</a>
     <a href="#">Relatorios</a>
     <a href="#">Rotas</a>
  <a class="link-logout" onclick="logout()">sair</a>
