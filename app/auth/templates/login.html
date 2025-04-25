@@ -10,7 +10,10 @@
     <div class="login-container">
         <h2>Entrar</h2>
         <form method="POST" action="{{ url_for('auth_bp.login') }}">
-            <input type="text" name="username" placeholder="Usuário" required>
+            {% if message %}
+                <p class="error-message">{{ message }}</p>
+            {% endif %}
+            <input type="text" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Senha" required>
             <button class="button-send" type="submit">Entrar</button>
         </form>
