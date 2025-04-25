@@ -129,7 +129,7 @@ def main():
             db.session.add(s2)
             db.session.commit()
             print("Venda 2 adicionada!")
-            db.session.add_all([i1, i2])
+            db.session.add_all([i3, i4])
             db.session.commit()
             print("Itens da venda 2 adicionados!")
 
@@ -190,7 +190,7 @@ def main():
             db.session.add(s2)
             db.session.commit()
             print("Venda 2 adicionada!")
-            db.session.add(i1)
+            db.session.add(i3)
             db.session.commit()
             print("Itens da venda 2 adicionados!")
 
