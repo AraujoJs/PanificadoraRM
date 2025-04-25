@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block main %}
+    <h2>Plan des routes</h2>
+    <table style="font-size: 80%">
+        <thead>
+        <tr>
+            <th>Route</th>
+            <th>endpoint</th>
+            <th>Méthode(s)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for link in links | sort(attribute='endpoint') %}
+            <tr>
+                <td>
+                    {% if link.url -%}
+                        <a href="{{ link.url }}">{{ link.route }}</a>
+                    {%- else -%}
+                        {{ link.route }}
+                    {%- endif %}
+                </td>
+                {%- set ep = link.endpoint.split('.') %}
+                <td><code title="fonction {{ ep[0]+'()' if ep | length == 1 else ep[1]+'()' }}{{ ', Blueprint "'+ep[0]+'"' if ep | length == 2 }}">{{ link.endpoint }}</code></td>
+                <td>{{ link.methods }}</td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
     <title>Panificadora-RM</title>
 </head>
 <body>
     <div class="login-container">
         <h2>Entrar</h2>
-        <form method="POST" action="{{ url_for('auth_bp.login') }}">
+        <form id="login-form">
             {% if message %}
                 <p class="error-message">{{ message }}</p>
             {% endif %}
@@ -23,5 +23,39 @@
             <span>Não tem conta? </span><a href="{{ url_for('auth_bp.register') }}">Cadastre-se</a>
         </div>
     </div>
+
+<script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = e.target;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+            const res = await fetch("/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                sessionStorage.setItem("token", data.token);
+                window.location.href = "/home"
+            } else {
+                alert(data.message || "login falhou");
+            }
+
+        } catch (err) {
+            alert("Erro ao se conectar com o servidor.");
+            console.error(err)
+        }
+    });
+</script>
 </body>
 </html>

@@ -40,37 +40,35 @@ def login_indentify():
     return render_template('login_indentify.html')
 
 
-@auth_bp.route('/login', methods=('POST', 'GET'))
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        try:
+            data = request.get_json()
+            email = data.get('email')
+            password = data.get('password')
 
+            user = User.query.filter_by(email=email).first()
 
-        user = User.query.filter_by(email=email).first()
+            if user and user.check_password(password):
+                token = jwt.encode({
+                    'user_id': str(user.user_id),
+                    'role': user.role,
+                    'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
+                }, SECRET_KEY, algorithm='HS256')
+                session['user_id'] = user.user_id
+                session['role'] = user.role
 
-        if user and user.check_password(password):
-            utc_now = datetime.datetime.now(pytz.utc)
-            exp_time = utc_now + datetime.timedelta(hours=2)
-
-            token = jwt.encode({
-                'user_id': str(user.user_id),
-                'role': user.role,
-                'exp': int(exp_time.timestamp())
-            }, SECRET_KEY, algorithm='HS256')
-
-            session['user_id'] = user.user_id
-            session['role'] = user.role
-
-            agent = request.headers.get('User-Agent', '')
-            if 'Android' in agent:
                 return jsonify({'token': token}), 200
-            else:
-                return redirect(url_for('home.home'), 200)
-        return render_template('login.html', message="Usuário ou senha inválida.")
+
+            return jsonify({'message': 'Usuário ou senha inválida.'}), 401
+
+        except Exception as e:
+            print('Erro no login:', e)
+            return jsonify({'message': 'Erro interno'}), 500
+
     elif request.method == 'GET':
         return render_template('login.html')
-    return jsonify({'message': 'Método não permitido.'}), 405
 
 
 
@@ -81,12 +79,15 @@ def register():
 
 
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=('GET', 'POST'))
 @token_required
 def logout(current_user):
-    session.clear()
-    return jsonify({"message": "Logout realizado com sucesso!"}), 200
-
+    if request.method == 'GET':
+        session.clear()
+        return redirect(url_for('login'))
+    elif request.method == 'POST':
+        session.clear()
+        return jsonify({'message': f'user {current_user.user_id} disconnected.'}), 200
 
 @auth_bp.route('/users')
 # @token_required
