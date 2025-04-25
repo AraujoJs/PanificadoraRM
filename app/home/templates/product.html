@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block main %}
+    <h2>Lista de produtos</h2>
+    <table style="font-size: 80%">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Preço (unidade)</th>
+            <th>Estoque</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- for product in products %}
+            <tr>
+                <td>
+                    {{ product.product_id }}
+                </td>
+                <td>
+                    {{ product.name }}
+                </td>
+                <td>
+                    {{ "%.2f" | format(product.unit_price) }} R$
+                </td>
+                <td>
+                    {{ product.stock }}
+                </td>
+            </tr>
+        {%- endfor %}
+        </tbody>
+    </table>
+{% endblock %}
