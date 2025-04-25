@@ -15,7 +15,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # @bp.route('/')
 # def index():
 #     usuarios = Usuario.query.all()  # Pega todos os usuários do banco
-#     return render_template('index.html', usuarios=usuarios)  # Passa os dados para o template
+#     return render_template('home.html', usuarios=usuarios)  # Passa os dados para o template
 #
 # # Rota para criar um usuário via API
 # @bp.route('/api/usuarios', methods=['POST'])

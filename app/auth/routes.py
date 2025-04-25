@@ -43,9 +43,9 @@ def login_indentify():
 @auth_bp.route('/login', methods=('POST', 'GET'))
 def login():
     if request.method == 'POST':
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
 
         user = User.query.filter_by(email=email).first()
 
@@ -61,9 +61,13 @@ def login():
 
             session['user_id'] = user.user_id
             session['role'] = user.role
-            return jsonify({'token': token}), 200
 
-        return jsonify({'message': 'Credenciais inválidas.'}), 401
+            agent = request.headers.get('User-Agent', '')
+            if 'Android' in agent:
+                return jsonify({'token': token}), 200
+            else:
+                return redirect(url_for('home.home'), 200)
+        return render_template('login.html', message="Usuário ou senha inválida.")
     elif request.method == 'GET':
         return render_template('login.html')
     return jsonify({'message': 'Método não permitido.'}), 405

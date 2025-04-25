@@ -44,7 +44,7 @@ def main():
         u1 = User(
             user_id=uuid.UUID("768e0770-37d7-4485-8ef0-724a593db3d3"),
             name="João",
-            email="joão@gmail.com",
+            email="joao@gmail.com",
             password="12345678",
             role="admin"
         )
