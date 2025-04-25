@@ -73,7 +73,7 @@ def sale_item():
         user_name = User.query.filter_by(user_id=user_id).first().name
         for item in items:
             item.user_name = user_name
-            item.product_name = Product.query.filter_by(product_id=item.product_id).first()
+            item.product_name = Product.query.filter_by(product_id=item.product_id).first().name
 
     return render_template('sale_item.html', items=items)
 
