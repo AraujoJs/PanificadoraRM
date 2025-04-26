@@ -19,20 +19,19 @@ def create_app():
     app.config.from_pyfile(os.path.join(os.path.dirname(__file__), 'config.py'))
     db.init_app(app)
 
-    from app.auth.routes import auth_bp
-    from app.auth.routes import users_bp
-    from app.products.routes import products_bp
-    from app.sales.routes import sales_bp
-    from app.sales.routes import sale_items_bp
-    from app.home.routes import home_bp
+    from app.auth.routes import auth
+    from app.auth.routes import usuario
+    from app.products.routes import produtos
+    from app.sales.routes import vendas
+    from app.sales.routes import item_venda
+    from app.home.routes import inicio
 
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(users_bp, url_prefix="/api/v1/users")
+    app.register_blueprint(auth, url_prefix='/auth')
+    app.register_blueprint(usuario, url_prefix="/api/v1/usuarios")
 
-    app.register_blueprint(products_bp, url_prefix='/api/v1/products')
-    app.register_blueprint(sales_bp, url_prefix='/api/v1/sales')
-    app.register_blueprint(sale_items_bp, url_prefix='/api/v1/sale_items')
+    app.register_blueprint(produtos, url_prefix='/api/v1/produtos')
+    app.register_blueprint(vendas, url_prefix='/api/v1/vendas')
+    app.register_blueprint(item_venda, url_prefix='/api/v1/item-venda')
 
-    app.register_blueprint(home_bp, url_prefix='/home')
-
+    app.register_blueprint(inicio, url_prefix='/inicio')
     return app

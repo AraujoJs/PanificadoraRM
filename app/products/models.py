@@ -3,13 +3,14 @@
 Script: Backend/models
 Création: jojo, le 12/04/2025
 """
-import uuid
-from email.policy import default
-from sqlalchemy import UUID
-from app import db
-
 
 # Imports
+import uuid
+
+from sqlalchemy import UUID
+
+from app import db
+
 
 class Product(db.Model):
     __tablename__ = 'products'

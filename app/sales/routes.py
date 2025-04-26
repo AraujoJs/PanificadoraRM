@@ -12,20 +12,20 @@ from app.sales.models import Sale, SaleItem
 from app.auth.routes import get_user_name_by_id
 from utils.auth import token_required
 
-sales_bp = flask.Blueprint('sales_bp', __name__)
-sale_items_bp = flask.Blueprint('sale_items_bp', __name__)
+vendas = flask.Blueprint('sales_bp', __name__)
+item_venda = flask.Blueprint('sale_items_bp', __name__)
 
-@sale_items_bp.route('/<sale_id>')
+@item_venda.route('/<venda_id>')
 @token_required
-def sale_items(current_user, sale_id):
-    sale_items = SaleItem.query.filter_by(sale_id=sale_id).all()
+def sale_items(current_user, venda_id):
+    sale_items = SaleItem.query.filter_by(sale_id=venda_id).all()
     if len(sale_items) == 0:
-        return jsonify({"message": f"The sale {sale_id} has no items."}), 201
+        return jsonify({"message": f"The sale {venda_id} has no items."}), 201
     return jsonify([{"item_id": s.item_id, "quantity": s.quantity, "subtotal": s.subtotal, "user_id": s.user_id,
                      "sale_id": s.sale_id, "product_id": s.product_id} for s in sale_items])
 
 
-@sales_bp.route('/', methods=('GET', 'POST'))
+@vendas.route('/', methods=('GET', 'POST'))
 @token_required
 def sales(current_user):
     if flask.request.method == 'POST':
@@ -40,14 +40,14 @@ def sales(current_user):
             return get_sales_json(sales)
         return jsonify({'message': 'You need to login before.'}), 405
 
-@sales_bp.route('/user/<user_id>')
+@vendas.route('/usuario/<usuario_id>')
 @token_required
-def sales_user(current_user, user_id):
+def sales_user(current_user, usuario_id):
     sales = []
     if current_user.role == "admin":
-        sales = Sale.query.filter_by(user_id=uuid.UUID(user_id)).all()
+        sales = Sale.query.filter_by(user_id=uuid.UUID(usuario_id)).all()
         if len(sales) == 0:
-            return jsonify({"message": f"This user {get_user_name_by_id(user_id)} has no sales yet."}), 201
+            return jsonify({"message": f"This user {get_user_name_by_id(usuario_id)} has no sales yet."}), 201
     else:
         sales = Sale.query.filter_by(user_id=current_user.user_id)
         if sales is None:
@@ -59,9 +59,9 @@ def sales_user(current_user, user_id):
                  "payment_method": s.payment_method,
                  "user_id": s.user_id} for s in sales]
 
-@sales_bp.route('/itens/<sale_id>')
-def itens_sale(sale_id):
-    itens = SaleItem.query.filter_by(item_id=uuid.UUID(sale_id))
+@vendas.route('/item-venda/<venda_id>')
+def itens_sale(venda_id):
+    itens = SaleItem.query.filter_by(item_id=uuid.UUID(venda_id))
 
     return get_itens_json(itens)
 

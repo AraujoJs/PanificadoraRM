@@ -6,10 +6,10 @@ Création: jojo, le 12/04/2025
 import uuid
 
 from sqlalchemy import UUID
-from app.sales.models import Sale, SaleItem
-# Imports
-
 from app.extensions import db
+
+
+# Imports
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -22,7 +22,6 @@ class User(db.Model):
 
     sales = db.relationship('Sale', backref='user', lazy=True)
     sale_items = db.relationship('SaleItem', backref='user', lazy=True)
-
 
     def check_password(self, user_password):
         return user_password == self.password

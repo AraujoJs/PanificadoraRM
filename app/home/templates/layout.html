@@ -28,14 +28,14 @@
     function logout() {
         const token = sessionStorage.getItem("token"); // ou localStorage
 
-        fetch("/auth/logout", {
+        fetch("/auth/sair", {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token
             }
         }).then(response => {
             if (response.ok) {
-                window.location.href = "/auth/login";
+                window.location.href = "/auth/entrar";
             } else {
                 alert("Erro ao sair.");
             }

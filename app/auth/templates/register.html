@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
-    <link rel="stylesheet" href=" {{ url_for('static', filename='form.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
 </head>
 <body>
 
   <div class="login-container">
     <h2>Registro</h2>
-    <form action="{{ url_for('auth_bp.register') }}" method="post">
+    <form action="{{ url_for('auth.register') }}" method="post">
       <input type="text" name="name" placeholder="Nome completo" required>
       <input type="email" name="email" placeholder="E-mail" required>
       <input type="password" name="password" placeholder="Senha" required>
@@ -17,7 +17,7 @@
       <input class="button-send" type="submit" value="Registrar">
     </form>
     <div class="links">
-      Já tem uma conta? <a href="{{ url_for('auth_bp.login') }}">Faça login</a>
+      Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
     </div>
   </div>
 

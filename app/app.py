@@ -9,7 +9,7 @@ app.config['SESSION_PERMANENT'] = False
 
 @app.route('/')
 def index():
-    return redirect(url_for('auth_bp.login'))
+    return redirect(url_for('auth.login'))
 
 
 if __name__ == "__main__":

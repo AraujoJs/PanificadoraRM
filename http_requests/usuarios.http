@@ -14,11 +14,11 @@ Content-Type: application/json
 }
 
 ### Login na sessão admin
-POST http://localhost:5000/auth/login
+POST http://localhost:5000/auth/entrar
 Content-Type: application/json
 
 {
-  "email": "joão@gmail.com",
+  "email": "joao@gmail.com",
   "password": "12345678"
 }
 
@@ -42,8 +42,8 @@ Content-Type: application/json
 
 ### LISTAR PRODUTOS (com token de autenticação)
 # @no-cookie-jar
-GET http://localhost:5000/api/v1/products
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYmRmOWI3MTgtMWYzNi00MzVhLWIzOWMtODk1YzcyOTg3ZTMyIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU0MTYyMjd9.7uIRpjmaxEZj9jKqv4-oWlPrkecua827LqF_EXseGKo
+GET http://localhost:5000/api/v1/produtos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1Njc4ODAxfQ.kRCqS4jS_QbpQ9gbfiXBNl5NgfSlRqnBobyDTszfk1I
 
 ### LISTAR USUARIOS (com token de autenticação)
 # @no-cookie-jar

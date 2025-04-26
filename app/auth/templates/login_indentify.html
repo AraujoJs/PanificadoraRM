@@ -9,7 +9,7 @@
 <body>
     <div class="login-container">
         <h2>Encontrar sua conta</h2>
-        <form method="POST" action="{{ url_for('auth_bp.login') }}">
+        <form method="POST" action="{{ url_for('auth.login') }}">
             <input type="text" name="username" placeholder="Email" required>
             <button class="button-send" type="submit">Entrar</button>
             <button class="button-reset" type="reset" onclick="history.back()">Cancelar</button>

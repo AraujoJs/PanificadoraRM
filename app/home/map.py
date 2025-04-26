@@ -6,9 +6,6 @@ Création: jojo, le 26/04/2025
 import flask
 
 
-# Imports
-
-
 # Fonctions
 def site_map(url_map):
     """Plan d'un site sous forme d'une liste 2D contenant la description de
