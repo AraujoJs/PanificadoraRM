@@ -3,10 +3,11 @@
 Script: Backend/routes
 Création: jojo, le 12/04/2025
 """
-
+import flask
 # Imports
 from flask import Blueprint, render_template, session, redirect, url_for, jsonify
 from app.auth.models import User
+from app.home.map import site_map
 from app.products.models import Product
 from app.sales.models import Sale, SaleItem
 from app.sales.routes import sales
@@ -107,3 +108,12 @@ def api_home(current_user):
         'email': current_user.email,
         'role': current_user.role
     })
+
+@home_bp.route('/rotas')
+def rotas_index():
+    links = site_map(flask.current_app.url_map)
+    return render_template('map.html', links=links)
+
+@home_bp.route('/relatorio')
+def relatorio():
+    return render_template('relatorios.html')
