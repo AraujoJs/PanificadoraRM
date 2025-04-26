@@ -3,14 +3,13 @@
 Script: Backend/rotues
 Création: jojo, le 12/04/2025
 """
-from crypt import methods
-from tkinter.font import names
 
 from flask import Blueprint, jsonify, request
-from flask.globals import request_ctx
+
 from app.extensions import db
 from app.products.models import Product
 from utils.auth import token_required
+
 # Imports
 
 

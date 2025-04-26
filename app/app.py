@@ -2,7 +2,6 @@ from flask import url_for, redirect
 
 from app import create_app
 
-
 # Cria e roda a aplicação Flask
 app = create_app()
 app.config['SESSION_PERMANENT'] = False
