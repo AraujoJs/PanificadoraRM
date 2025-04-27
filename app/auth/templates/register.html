@@ -7,19 +7,59 @@
 </head>
 <body>
 
-  <div class="login-container">
+<div class="login-container">
     <h2>Registro</h2>
-    <form action="{{ url_for('auth.register') }}" method="post">
-      <input type="text" name="name" placeholder="Nome completo" required>
-      <input type="email" name="email" placeholder="E-mail" required>
-      <input type="password" name="password" placeholder="Senha" required>
-      <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
-      <input class="button-send" type="submit" value="Registrar">
+    <form id="register-form">
+        <input type="text" name="name" placeholder="Nome" required>
+        <input type="email" name="email" placeholder="E-mail" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
+        <button class="button-send" type="submit">Registrar</button>
     </form>
     <div class="links">
-      Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
+        Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
     </div>
-  </div>
+</div>
+
+<script>
+    document.getElementById('register-form').addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = e.target;
+
+        const name = form.name.value;
+        const email = form.email.value;
+        const password = form.password.value;
+        const confirm_password = form.confirm_password.value;
+
+        if (password === confirm_password) {
+            try {
+                const res = await fetch("/auth/registrar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({name, email, password}),
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    sessionStorage.setItem("token", data.token);
+                    window.location.href = "/inicio";
+                } else {
+                    alert(data.message || "Falha ao criar usuario.");
+                }
+            } catch (err) {
+                alert("Erro ao se conectar com o servidor.");
+                console.error(err)
+            }
+        } else {
+            alert("As senhas devem ser iguais.");
+        }
+    });
+</script>
 
 </body>
 </html>

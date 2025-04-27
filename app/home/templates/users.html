@@ -1,7 +1,10 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}{{ super() }} - Usuários{% endblock %}
 {% block main %}
-    <h2>Usuarios</h2>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='home-user.css') }}">
+    </head>
+    <h2>Usuários</h2>
     <table style="font-size: 80%">
         <thead>
         <tr>
@@ -9,25 +12,58 @@
             <th>Nome</th>
             <th>Email</th>
             <th>Cargo</th>
+            <th>Ações</th>  <!-- Adiciona a coluna de ações -->
         </tr>
         </thead>
         <tbody>
         {%- for user in users %}
             <tr>
-                <td>
-                    {{ user.user_id }}
-                </td>
-                <td>
-                    {{ user.name }}
-                </td>
-                <td>
-                    {{ user.email }}
-                </td>
-                <td>
-                    {{ user.role }}
+                <td>{{ user.user_id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td style="display: flex; justify-content: end">
+                    {% if user.role != 'admin' %}
+                        <img src="{{ url_for('static', filename='assets/icon/x-letter.svg') }}"
+                             onclick="deleteUser('{{ user.user_id }}')"
+                             class="button-delete"
+                             alt="Excluir Usuário">
+                    {% endif %}
+
                 </td>
             </tr>
         {%- endfor %}
         </tbody>
     </table>
+
+    <script>
+    async function deleteUser(user_id) {
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        console.log('Usuário confirmado para exclusão:', user_id);
+        const token = sessionStorage.getItem('token');
+
+        try {
+            const res = await fetch('/auth/registrar', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id })
+            });
+
+            if (res.ok) {
+                window.location.href = '/inicio/usuarios';
+            } else {
+                alert('Falha ao deletar usuário.');
+            }
+        } catch (err) {
+            alert("Erro ao se conectar com o servidor.");
+            console.error(err);
+        }
+    } else {
+        console.log('Exclusão cancelada para o usuário:', userId);
+    }
+}
+    </script>
 {% endblock %}
