@@ -14,41 +14,99 @@ import uuid
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
 
 from app.auth.models import User
-from app.extensions import SECRET_KEY
+from app.extensions import SECRET_KEY, db
 from utils.auth import token_required
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 usuario = Blueprint('usuario', __name__, template_folder='templates')
 
-@auth.route('/entrar', methods=['GET', 'POST'])
+
+@auth.route('/entrar', methods=['GET'])
 def login():
-    if request.method == 'POST':
-        try:
-            data = request.get_json()
-            email = data.get('email')
-            password = data.get('password')
-            user = User.query.filter_by(email=email).first()
-            if user and user.check_password(password):
-                token = jwt.encode({
-                    'user_id': str(user.user_id),
-                    'role': user.role,
-                    'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
-                }, SECRET_KEY, algorithm='HS256')
-                session['user_id'] = user.user_id
-                session['role'] = user.role
-                return jsonify({'token': token}), 200
-            return jsonify({'message': 'Usuário ou senha inválida.'}), 401
-        except Exception as e:
-            print('Erro no login:', e)
-            return jsonify({'message': 'Erro interno'}), 500
-    elif request.method == 'GET':
-        return render_template('login.html')
+    return render_template('login.html')
+
+def get_token(user):
+    token = jwt.encode({
+        'user_id': str(user.user_id),
+        'role': user.role,
+        'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
+    }, SECRET_KEY, algorithm='HS256')
+    session['user_id'] = user.user_id
+    session['role'] = user.role
+    return token
+
+@auth.route('/entrar', methods=['POST'])
+def send_login():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            token = get_token(user)
+            return jsonify({'token': token}), 200
+        return jsonify({'message': 'Usuário ou senha inválida.'}), 401
+    except Exception as e:
+        print('Erro no login:', e)
+        return jsonify({'message': 'Erro interno'}), 500
 
 
-@auth.route('/registrar', methods=('GET', 'POST'))
+@auth.route('/registrar', methods=['GET'])
 def register():
-    users = User.query.all()
     return render_template('register.html')
+
+
+@auth.route('/registrar', methods=['POST'])
+def send_register():
+    try:
+        data = request.get_json() or {}
+        name = data.get('name')
+        email = data.get('email')
+        password = data.get('password')
+
+        if not all([name, email, password]):
+            return jsonify({"message": "Os campos nome, email e senha são obrigatorios."}), 400
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            try:
+                new_user = User(name=name, email=email, password=password, role="user")
+                db.session.add(new_user)
+                db.session.commit()
+                token = get_token(new_user)
+
+                return jsonify({'token': token}), 200
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"message": f"Falha ao adicionar o usuario no banco de dados. Erro: {str(e)}"}), 500
+    except Exception as e:
+        print(f"Erro na busca de dados: {str(e)}")
+        return jsonify({"message": "Erro interno."}), 500
+
+
+@auth.route('/registrar', methods=['DELETE'])
+@token_required
+def delete_register(current_user):
+    if current_user.role == 'admin':
+        user_id = request.get_json().get('user_id')
+
+        if not user_id:
+            return jsonify({"message": "ID de usuário não fornecido."}), 400
+
+        try:
+            user = User.query.filter_by(user_id=user_id).first()
+            if not user:
+                return jsonify({"message": "Usuário não encontrado no banco de dados."}), 404
+
+            db.session.delete(user)
+            db.session.commit()
+            return '', 204
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": f"Falha ao remover o usuário no banco de dados. Erro: {str(e)}"}), 500
+    else:
+        return jsonify({'message': 'Ação não autorizada.'}), 403
 
 
 @auth.route('/entrar/recuperar')

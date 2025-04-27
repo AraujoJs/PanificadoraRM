@@ -78,7 +78,7 @@ def users():
         users = User.query.all()
     else:
         users = User.query.filter_by(user_id=user.user_id).all()
-    return render_template('users.html', users=users)
+    return render_template('users.html', users=users, logged_user=user)
 
 
 @inicio.route('/api')
