@@ -45,3 +45,12 @@ Content-Type: application/json
     }
   ]
 }
+
+### DELETE venda
+DELETE http://localhost:5000/api/v1/vendas/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU3OTI4NjJ9.F9rMhkA90QQ5dpXFABSYOidr0Lyvf0KWP2bLfmflu7E
+Content-Type: application/json
+
+{
+  "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333"
+}

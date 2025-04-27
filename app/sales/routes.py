@@ -8,14 +8,15 @@ from datetime import datetime
 
 import flask
 from flask import session, jsonify, request
-from app.extensions import db
 
-from app.sales.models import Sale, SaleItem
 from app.auth.routes import get_user_name_by_id
+from app.extensions import db
+from app.sales.models import Sale, SaleItem
 from utils.auth import token_required
 
 vendas = flask.Blueprint('sales_bp', __name__)
 item_venda = flask.Blueprint('sale_items_bp', __name__)
+
 
 @item_venda.route('/<venda_id>')
 @token_required
@@ -39,6 +40,7 @@ def sales(current_user):
             sales = Sale.query.filter_by(user_id=current_user.user_id).all()
             return get_sales_json(sales)
         return jsonify({'message': 'You need to login before.'}), 405
+
 
 @vendas.route('/', methods=['POST'])
 @token_required
@@ -86,6 +88,26 @@ def add_sale(current_user):
         return jsonify({"message", f"Erro ao inserir venda: {str(e)}"}), 500
 
 
+@vendas.route('/', methods=['DELETE'])
+@token_required
+def delete_sale(current_user):
+    sale_id = request.get_json().get('sale_id')
+    sale = Sale.query.filter_by(sale_id=sale_id).first()
+    if not sale:
+        return jsonify({"message": "Venda não existe."}), 404
+
+    sale_itens = SaleItem.query.filter_by(sale_id=sale_id).all()
+
+    try:
+
+        for item in sale_itens:
+            db.session.delete(item)
+        db.session.delete(sale)
+        db.session.commit()
+        return '', 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Erro ao deletar venda: {str(e)}"}), 500
 
 
 @vendas.route('/usuario/<usuario_id>')
@@ -102,10 +124,11 @@ def sales_user(current_user, usuario_id):
             return jsonify({"message": f"This user {current_user.name} has no sales yet."}), 201
 
     return [{"sale_id": s.sale_id,
-                 "sale_datetime": s.sale_datetime,
-                 "total": s.total,
-                 "payment_method": s.payment_method,
-                 "user_id": s.user_id} for s in sales]
+             "sale_datetime": s.sale_datetime,
+             "total": s.total,
+             "payment_method": s.payment_method,
+             "user_id": s.user_id} for s in sales]
+
 
 @vendas.route('/item-venda/<venda_id>')
 def itens_sale(venda_id):
@@ -113,11 +136,13 @@ def itens_sale(venda_id):
 
     return get_itens_json(itens)
 
+
 def get_itens_json(itens):
     return flask.jsonify(
         [{"item_id": si.item_id, "quantity": si.quantity, "subtotal": si.subtotal, "user_id": si.user_id,
           "sale_id": si.sale_id, "product_id": si.product_id}
          for si in itens])
+
 
 def get_sales_json(sales):
     return flask.jsonify(
