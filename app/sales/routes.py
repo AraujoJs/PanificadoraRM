@@ -4,9 +4,11 @@ Script: Backend/routes
 Création: jojo, le 12/04/2025
 """
 import uuid
+from datetime import datetime
 
 import flask
-from flask import session, jsonify
+from flask import session, jsonify, request
+from app.extensions import db
 
 from app.sales.models import Sale, SaleItem
 from app.auth.routes import get_user_name_by_id
@@ -25,11 +27,9 @@ def sale_items(current_user, venda_id):
                      "sale_id": s.sale_id, "product_id": s.product_id} for s in sale_items])
 
 
-@vendas.route('/', methods=('GET', 'POST'))
+@vendas.route('/', methods=['GET'])
 @token_required
 def sales(current_user):
-    if flask.request.method == 'POST':
-        pass
     if current_user.role == 'admin':
         sales = Sale.query.all()
         return get_sales_json(sales)
@@ -39,6 +39,54 @@ def sales(current_user):
             sales = Sale.query.filter_by(user_id=current_user.user_id).all()
             return get_sales_json(sales)
         return jsonify({'message': 'You need to login before.'}), 405
+
+@vendas.route('/', methods=['POST'])
+@token_required
+def add_sale(current_user):
+    data = request.get_json()
+    sale_id = data.get('sale_id')
+    sale_datetime_str = data.get('sale_datetime')
+    payment_method = data.get('payment_method')
+    total = data.get('total')
+    user_id = data.get('user_id')
+
+    itens = data.get('itens')
+
+    try:
+        sale_datetime = datetime.strptime(sale_datetime_str, "%d/%m/%Y %H:%M:%S")
+    except ValueError:
+        return jsonify({"message": "Formato de data inválido. Use 'dd/mm/yyyy HH:MM:SS'."}), 400
+
+    if Sale.query.filter_by(sale_id=sale_id).first():
+        return jsonify({"message": "Venda já existe."}), 409
+
+    sale = Sale(
+        sale_id=sale_id,
+        sale_datetime=sale_datetime,
+        payment_method=payment_method,
+        total=total,
+        user_id=user_id
+    )
+    sale_itens = [
+        SaleItem(
+            product_id=item['product_id'],
+            quantity=item['quantity'],
+            subtotal=item['subtotal'],
+            user_id=user_id,
+            sale_id=sale_id
+        ) for item in itens
+    ]
+    try:
+        db.session.add(sale)
+        db.session.add_all(sale_itens)
+        db.session.commit()
+        return '', 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message", f"Erro ao inserir venda: {str(e)}"}), 500
+
+
+
 
 @vendas.route('/usuario/<usuario_id>')
 @token_required

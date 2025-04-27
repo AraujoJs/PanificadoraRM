@@ -1,0 +1,47 @@
+### POST login
+POST http://localhost:5000/auth/entrar
+Content-Type: application/json
+
+{
+  "email": "jojo@gmail.com",
+  "password": "12345678"
+}
+
+### POST venda
+POST http://localhost:5000/api/v1/vendas/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU3OTI4NjJ9.F9rMhkA90QQ5dpXFABSYOidr0Lyvf0KWP2bLfmflu7E
+Content-Type: application/json
+
+{
+  "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
+  "sale_datetime": "26/04/2025 22:26:16",
+  "total": 34.5,
+  "payment_method": "pix",
+  "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
+  "itens": [
+    {
+      "item_id": 1,
+      "quantity": 3,
+      "subtotal": 15.0,
+      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
+      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
+      "product_id": "73b0ee3f-1173-417f-93d8-aa7392c5c83e"
+    },
+    {
+      "item_id": 2,
+      "quantity": 2,
+      "subtotal": 30.0,
+      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
+      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
+      "product_id": "18735ec5-193a-4010-9756-a5e71ec691fd"
+    },
+    {
+      "item_id": 3,
+      "quantity": 10,
+      "subtotal": 10.0,
+      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
+      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
+      "product_id": "94267fd0-c23b-4a5b-a2aa-eb44680820fe"
+    }
+  ]
+}

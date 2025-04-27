@@ -4,15 +4,19 @@ Script: Backend/auth
 Création: jojo, le 13/04/2025
 """
 from functools import wraps
+
+import jwt
 from flask import request, jsonify
-import jwt, os
-from app.extensions import SECRET_KEY
+
 from app.auth.models import User
+from app.extensions import SECRET_KEY
+
 
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = None
+
         if 'Authorization' in request.headers:
             token = request.headers['Authorization'].split(" ")[1]  # Pega o token após o "Bearer"
 
@@ -32,4 +36,5 @@ def token_required(f):
             return jsonify({'message': 'Token invalido.'}), 401
 
         return f(current_user, *args, **kwargs)
+
     return decorated_function
