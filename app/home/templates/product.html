@@ -9,25 +9,122 @@
             <th>Nome</th>
             <th>Preço (unidade)</th>
             <th>Estoque</th>
+            <th>Estado</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="products-table">
         {%- for product in products %}
-            <tr>
-                <td>
-                    {{ product.product_id }}
-                </td>
-                <td>
-                    {{ product.name }}
-                </td>
-                <td>
-                    {{ "%.2f" | format(product.unit_price) }} R$
-                </td>
-                <td>
-                    {{ product.stock }}
+            <tr class="{{ 'active-product' if product.is_active else 'inactive-product' }}">
+                <td>{{ product.product_id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ "%.2f" | format(product.unit_price) }} R$</td>
+                <td>{{ product.stock }}</td>
+                <td>{{ 'Ativo' if product.is_active else 'Inativo' }}</td>
+                <td style="display: flex; justify-content: end">
+                    {% if logged_user.role == 'admin' %}
+                        {% set icon = '/x-letter.svg' if product.is_active else '/plus.svg' %}
+                        {% set alt_text = "Excluir Produto" if product.is_active else "Ativar produto" %}
+                        {% set action = "desactive" if product.is_active else "activate"%}
+
+                        <img src="{{ url_for('static', filename='assets/icon' + icon) }}"
+                             onclick="{{ action }}Product('{{ product.product_id }}')"
+                                     class="button-delete"
+                             alt="{{ alt_text }}">
+                    {% endif %}
                 </td>
             </tr>
         {%- endfor %}
         </tbody>
     </table>
+    {% if logged_user.role == 'admin' %}
+    <button id="toggleButton" onclick="toggleProducts()">Mostrar Inativos</button>
+    {% endif %}
+    <script>
+        let showingActive = true;
+
+        function toggleProducts() {
+            const activeProducts = document.querySelectorAll('.active-product');
+            const inactiveProducts = document.querySelectorAll('.inactive-product');
+            const button = document.getElementById('toggleButton');
+
+            if (showingActive) {
+                activeProducts.forEach(row => row.style.display = 'none');
+                inactiveProducts.forEach(row => row.style.display = '');
+                button.textContent = 'Mostrar Ativos';
+            } else {
+                activeProducts.forEach(row => row.style.display = '');
+                inactiveProducts.forEach(row => row.style.display = 'none');
+                button.textContent = 'Mostrar Inativos';
+            }
+
+            showingActive = !showingActive;
+        }
+
+        // Inicialmente escondemos os inativos
+        window.onload = function () {
+            const inactiveProducts = document.querySelectorAll('.inactive-product');
+            inactiveProducts.forEach(row => row.style.display = 'none');
+        };
+
+
+        async function desactiveProduct(product_id) {
+            if (confirm('Tem certeza que deseja desativar esse produto?')) {
+                console.log("Produto confirmado para desativação:", product_id);
+                const token = sessionStorage.getItem('token');
+
+                try {
+                    const res = await fetch('/api/v1/produtos/desativar', {
+                        method: "PATCH",
+                        headers: {
+                            "Authorization": "Bearer " + token,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({product_id})
+                    })
+
+                    if (res.ok) {
+                        window.location.href = '/inicio/produtos';
+                    } else {
+                        alert("Erro ao desativar produto.");
+                    }
+                } catch (err) {
+                    alert("Erro ao se conectar com o servidor.");
+                    console.log(err);
+                }
+            } else {
+                console.log("Desativação cancelada do produto:", product_id);
+            }
+        }
+
+        async function activateProduct(product_id) {
+            if (confirm('Tem certeza que deseja ativar esse produto?')) {
+                console.log("Produto confirmado para ativação:", product_id);
+                const token = sessionStorage.getItem('token');
+
+                try {
+                    const res = await fetch('/api/v1/produtos/ativar', {
+                        method: "PATCH",
+                        headers: {
+                            "Authorization": "Bearer " + token,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({product_id})
+                    })
+
+                    if (res.ok) {
+                        window.location.href = '/inicio/produtos'
+                    } else {
+                        alert("Erro ao ativar produto.");
+                    }
+                } catch (err) {
+                    alert("Erro ao se conectar com o servidor.");
+                    console.log(err);
+                }
+            } else {
+                console.log("Ativação cancelada do produto:", product_id);
+            }
+        }
+    </script>
+
+
 {% endblock %}

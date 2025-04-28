@@ -11,6 +11,7 @@ from flask import session, jsonify, request
 
 from app.auth.routes import get_user_name_by_id
 from app.extensions import db
+from app.products.models import Product
 from app.sales.models import Sale, SaleItem
 from utils.auth import token_required
 
@@ -47,17 +48,12 @@ def sales(current_user):
 def add_sale(current_user):
     data = request.get_json()
     sale_id = data.get('sale_id')
-    sale_datetime_str = data.get('sale_datetime')
     payment_method = data.get('payment_method')
-    total = data.get('total')
     user_id = data.get('user_id')
 
     itens = data.get('itens')
 
-    try:
-        sale_datetime = datetime.strptime(sale_datetime_str, "%d/%m/%Y %H:%M:%S")
-    except ValueError:
-        return jsonify({"message": "Formato de data inválido. Use 'dd/mm/yyyy HH:MM:SS'."}), 400
+    sale_datetime = datetime.now()
 
     if Sale.query.filter_by(sale_id=sale_id).first():
         return jsonify({"message": "Venda já existe."}), 409
@@ -66,18 +62,34 @@ def add_sale(current_user):
         sale_id=sale_id,
         sale_datetime=sale_datetime,
         payment_method=payment_method,
-        total=total,
+        total=0.0,
         user_id=user_id
     )
-    sale_itens = [
-        SaleItem(
-            product_id=item['product_id'],
-            quantity=item['quantity'],
-            subtotal=item['subtotal'],
-            user_id=user_id,
-            sale_id=sale_id
-        ) for item in itens
-    ]
+    sale_itens = []
+
+    for item in itens:
+        product = Product.query.filter_by(product_id=item["product_id"]).first()
+
+        if product.stock < item["quantity"]:
+            return jsonify(
+                {"message": "Stock insuficiente.", "product_id": product.product_id, "stock": product.stock}), 422
+
+        item_quantity = item["quantity"]
+        item_price = product.unit_price
+        item_subtotal = float(item_quantity * item_price)
+
+        product.stock -= item_quantity
+        sale.total += item_subtotal
+
+        sale_itens.append(
+            SaleItem(
+                quantity=item_quantity,
+                subtotal=item_subtotal,
+                user_id=user_id,
+                sale_id=sale_id,
+                product_id=product.product_id
+            ))
+
     try:
         db.session.add(sale)
         db.session.add_all(sale_itens)
@@ -85,7 +97,7 @@ def add_sale(current_user):
         return '', 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message", f"Erro ao inserir venda: {str(e)}"}), 500
+        return jsonify({"message": f"Erro ao inserir venda: {str(e)}"}), 500
 
 
 @vendas.route('/', methods=['DELETE'])

@@ -42,7 +42,7 @@ def products():
         return redirect(url_for('auth.login'))
 
     products = Product.query.all()
-    return render_template('product.html', products=products)
+    return render_template('product.html', products=products, logged_user=user)
 
 
 @inicio.route('/item-venda')

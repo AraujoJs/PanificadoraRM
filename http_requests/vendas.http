@@ -9,46 +9,58 @@ Content-Type: application/json
 
 ### POST venda
 POST http://localhost:5000/api/v1/vendas/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU3OTI4NjJ9.F9rMhkA90QQ5dpXFABSYOidr0Lyvf0KWP2bLfmflu7E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTY3MWNjYTgtYTI4NS00YjQ1LThkZTktMjgwMTZlZTY5YzQzIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU4NTQ0NDh9.0Q8VKnypIP2ILahnXkpzNaHuuZsr_ftqtsJyAY6eXqQ
 Content-Type: application/json
 
 {
   "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
-  "sale_datetime": "26/04/2025 22:26:16",
-  "total": 34.5,
   "payment_method": "pix",
-  "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
+  "user_id": "e671cca8-a285-4b45-8de9-28016ee69c43",
   "itens": [
     {
-      "item_id": 1,
       "quantity": 3,
-      "subtotal": 15.0,
-      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
-      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
-      "product_id": "73b0ee3f-1173-417f-93d8-aa7392c5c83e"
+      "product_id": "ec30e84a-b650-431e-bb34-d9ffbc555265"
     },
     {
-      "item_id": 2,
-      "quantity": 2,
-      "subtotal": 30.0,
-      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
-      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
-      "product_id": "18735ec5-193a-4010-9756-a5e71ec691fd"
-    },
-    {
-      "item_id": 3,
       "quantity": 10,
-      "subtotal": 10.0,
-      "user_id": "ac2ff737-a86b-49b0-9dfa-92f4f5bf9efe",
-      "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3633333",
-      "product_id": "94267fd0-c23b-4a5b-a2aa-eb44680820fe"
+      "product_id": "ad1581f4-8799-4699-a040-d5864f4f00f9"
+    },
+    {
+      "quantity": 1,
+      "product_id": "43ce4033-4c3d-4a05-94ab-cb2b30e92e94"
     }
   ]
 }
 
+### POST venda 2
+POST http://localhost:5000/api/v1/vendas/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTY3MWNjYTgtYTI4NS00YjQ1LThkZTktMjgwMTZlZTY5YzQzIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU4NTQ0NDh9.0Q8VKnypIP2ILahnXkpzNaHuuZsr_ftqtsJyAY6eXqQ
+Content-Type: application/json
+
+{
+  "sale_id": "f8c30ff6-f573-4ca6-a2ef-b25bf3655555",
+  "payment_method": "debito",
+  "user_id": "e671cca8-a285-4b45-8de9-28016ee69c43",
+  "itens": [
+    {
+      "quantity": 4,
+      "product_id": "ec30e84a-b650-431e-bb34-d9ffbc555265"
+    },
+    {
+      "quantity": 20,
+      "product_id": "ad1581f4-8799-4699-a040-d5864f4f00f9"
+    },
+    {
+      "quantity": 5,
+      "product_id": "43ce4033-4c3d-4a05-94ab-cb2b30e92e94"
+    }
+  ]
+}
+
+
 ### DELETE venda
 DELETE http://localhost:5000/api/v1/vendas/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU3OTI4NjJ9.F9rMhkA90QQ5dpXFABSYOidr0Lyvf0KWP2bLfmflu7E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU3OTkwNDd9.hAjaSyetRn1S08ki-2MtVpl4WUEYr3ZqnDibEYDhPJQ
 Content-Type: application/json
 
 {

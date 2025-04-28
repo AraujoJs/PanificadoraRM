@@ -1,0 +1,31 @@
+### POST login
+POST http://localhost:5000/auth/entrar
+Content-Type: application/json
+
+{
+  "email": "joao@gmail.com",
+  "password": "12345678"
+}
+
+### POST venda
+POST http://localhost:5000/api/v1/produtos/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYWMyZmY3MzctYTg2Yi00OWIwLTlkZmEtOTJmNGY1YmY5ZWZlIiwicm9sZSI6InVzZXIiLCJleHAiOjE3NDU4NDk2MDB9.qIq9v7HEHcbP3LxH2fG9CosLD1YzTKPBROmpc4NLXM8
+Content-Type: application/json
+
+{
+  "name": "Bolo formigueiro",
+  "unit_price": 15.0,
+  "stock": 5
+}
+
+###
+
+### PATCH produto (atualizar estoque)
+PATCH http://localhost:5000/api/v1/produtos/estoque
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzY4ZTA3NzAtMzdkNy00NDg1LThlZjAtNzI0YTU5M2RiM2QzIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzQ1ODU3NTEyfQ.7bneTIcVInUhuzD9QpFoMQ4DYIxCf6XaQIIgMglMhYE
+Content-Type: application/json
+
+{
+  "quantity": 30,
+  "product_id": "43ce4033-4c3d-4a05-94ab-cb2b30e92e94"
+}
