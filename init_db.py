@@ -11,10 +11,10 @@ from app import create_app
 # Configurations globales
 logging.getLogger().setLevel(logging.DEBUG)
 
-from app.products.models import Product
-from app.sales.models import Sale, SaleItem
+from app.externo.products.models import Product
+from app.externo.sales.models import Sale, SaleItem
 from app import db
-from app.auth.models import User
+from app.externo.auth.models import User
 import uuid
 
 
