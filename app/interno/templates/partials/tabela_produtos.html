@@ -1,0 +1,21 @@
+<h2>Produtos cadastrados</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Fornecedor</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in itens %}
+        <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.nome }}</td>
+            <td>{{ i.tipo }}</td>
+            <td>{{ i.fornecedor }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,29 @@
+<h2>Todas as compras</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Produto</th>
+        <th>Data</th>
+        <th>Validade</th>
+        <th>Quantidade</th>
+        <th>Preço total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in itens %}
+        <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.produto.nome }}</td>
+            <td>{{ i.data_compra.strftime('%d/%m/%Y') }}</td>
+            <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
+            <td>{{ i.quantidade }}</td>
+            <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
+        <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
+    </tr>
+    </tbody>
+</table>

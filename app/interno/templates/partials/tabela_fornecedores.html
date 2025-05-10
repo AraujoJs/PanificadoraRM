@@ -1,0 +1,21 @@
+<h2>Fornecedores cadastrados</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Nome</th>
+        <th>Contato</th>
+        <th>Categoria</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in itens %}
+        <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.nome }}</td>
+            <td>{{ i.contato }}</td>
+            <td>{{ i.categoria }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
