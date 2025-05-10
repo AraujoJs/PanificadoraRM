@@ -6,10 +6,10 @@ Création: jojo, le 12/04/2025
 # Imports
 from flask import Blueprint, render_template, session, redirect, url_for, jsonify, current_app
 
-from app.auth.models import User
-from app.home.map import site_map
-from app.products.models import Product
-from app.sales.models import Sale, SaleItem
+from app.externo.auth.models import User
+from app.externo.home.map import site_map
+from app.externo.products.models import Product
+from app.externo.sales.models import Sale, SaleItem
 from utils.auth import token_required
 
 inicio = Blueprint('home', __name__, template_folder='templates')
@@ -17,7 +17,7 @@ inicio = Blueprint('home', __name__, template_folder='templates')
 
 @inicio.route('/')
 def index():
-    return redirect(url_for('home.sales'))
+    return redirect(url_for('interno.compras'))
 
 
 @inicio.route('/vendas')

@@ -13,7 +13,7 @@ import uuid
 
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
 
-from app.auth.models import User
+from app.externo.auth.models import User
 from app.extensions import SECRET_KEY, db
 from utils.auth import token_required
 

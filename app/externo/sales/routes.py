@@ -9,10 +9,10 @@ from datetime import datetime
 import flask
 from flask import session, jsonify, request
 
-from app.auth.routes import get_user_name_by_id
+from app.externo.auth.routes import get_user_name_by_id
 from app.extensions import db
-from app.products.models import Product
-from app.sales.models import Sale, SaleItem
+from app.externo.products.models import Product
+from app.externo.sales.models import Sale, SaleItem
 from utils.auth import token_required
 
 vendas = flask.Blueprint('sales_bp', __name__)

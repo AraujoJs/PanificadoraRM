@@ -7,7 +7,7 @@ Création: jojo, le 12/04/2025
 from flask import Blueprint, jsonify, request
 
 from app.extensions import db
-from app.products.models import Product
+from app.externo.products.models import Product
 from utils.auth import token_required
 
 # Imports
