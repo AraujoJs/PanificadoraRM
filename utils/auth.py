@@ -8,7 +8,7 @@ from functools import wraps
 import jwt
 from flask import request, jsonify, redirect, url_for
 
-from app.auth.models import User
+from app.externo.auth.models import User
 from app.extensions import SECRET_KEY
 
 

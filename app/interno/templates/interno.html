@@ -1,0 +1,16 @@
+{% extends 'layout_interno.html' %}
+{% block tilte %} {{ super() }} - Site Map{% endblock %}
+{% block main %}
+    {% if tela == 'compras' %}
+        {% include 'partials/filtros_compras.html' %}
+        {% include 'partials/tabela_compras.html' %}
+        <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
+    {% elif tela == 'produtos' %}
+        {% include 'partials/tabela_produtos.html' %}
+        <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
+    {% elif tela == 'fornecedores' %}
+        {% include 'partials/tabela_fornecedores.html' %}
+        <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
+    {% endif %}
+    <a href="{{ url_for("interno.compras_add") }}">Nova Compra</a>
+{% endblock %}
