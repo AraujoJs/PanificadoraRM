@@ -4,21 +4,80 @@
 
     {% if mode == 'add' %}
         <h2>Adicionar uma compra</h2>
-        <form method="POST" action="/interno/compras/add">
-            <label>Produto <input type="text" name="login" placeholder="Max. 8 caractères"> </label><br>
+        <form method="post" action="/interno/compras/add">
+            <label>Produto
+                {% if not produtos %}
+                    <br><a>Adicionar primeiro produto</a>
+                {% else %}
+                    <select name="produto_id" id="produtos" required>
+                        <option value="">Selecionar</option>
+                        {% for p in produtos %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                        {% endfor %}
+                        <option value="add">-- Novo produto --</option>
+                    </select>
+                {% endif %}
+            </label><br>
+
             <fieldset>
                 <legend>Informations sobre a compra</legend>
-                <label>Data de Compra <input type="text" id="data" name="data" placeholder="dd-mm-aaaa" pattern="\d{2}-\d{2}-\d{4}" required>
-</label>
-                <label>Data de validade <input type="date" name="last_name"> </label><br>
-                <label>Quantidade <input type="text" name="first_name"></label><br>
-                <label>Preço total <input type="text" name="last_name"> </label><br>
-                <button type="submit">Adicionar</button>
+                <label>Data de Compra <input type="date" name="data_compra" id="data-compra" required></label>
+                <label id="container-vencimento">Data de Vencimento <input type="date" id="data-vencimento"
+                                                                           name="data_vencimento" required></label><br>
+                <label>Quantidade <input type="number" id="quantity" min="1" name="quantidade" required></label><br>
+                <label>Preço total <input type="number" min="0.00" step="any" max="20000.00" id="preco-total"
+                                          name="preco_total" placeholder="Total: R$ 00,00" required></label>
+                <span id="preco-total-visor">Total:</span>
+                <br>
+                <button>Adicionar</button>
 
                 {% if error %}
-                    <small>Erreur ajout technician.</small>
+                    <small>Erro ao adicionar compra.</small>
+                {% endif %}
+            </fieldset>
+        </form>
+    {% elif mode == "update" %}
+        <h2>Atualizar compra n° {{ compra_id }}</h2>
+        <form method="POST" action="/interno/compras/update/{{ compra_id }}">
+            <input type="hidden" name="compra_id" value="{{ compra_id }}">
+            <label>Produto
+                {% if not produtos %}
+                    <br><a>Adicionar primeiro produto</a>
+                {% else %}
+                    <select name="produto_id" id="produtos" required>
+                        <option value="">Selecionar</option>
+                        {% for p in produtos %}
+                            <option value="{{ p.id }}"
+                                    {% if product_selected == p.id %}selected{% endif %}>{{ p.nome }}</option>
+                        {% endfor %}
+                        <option value="add">-- Novo produto --</option>
+                    </select>
+                {% endif %}
+            </label><br>
+
+            <fieldset>
+                <legend>Informations sobre a compra</legend>
+                <label>Data de Compra <input type="date" name="data_compra" id="data-compra" value="{{ data_compra }}"
+                                             required></label>
+                <label id="container-vencimento">Data de Vencimento <input type="date" id="data-vencimento"
+                                                                           name="data_vencimento"
+                                                                           value="{{ data_vencimento }}"
+                                                                           required></label><br>
+                <label>Quantidade <input type="number" id="quantity" min="1" name="quantidade" value="{{ quantidade }}"
+                                         required></label><br>
+                <label>Preço total <input type="number" min="0.00" step="any" max="20000.00" id="preco-total"
+                                          name="preco_total" placeholder="Total: R$ 00,00" value="{{ preco_total }}"
+                                          required></label>
+                <span id="preco-total-visor">Total:</span>
+                <br>
+                <button>Adicionar</button>
+
+                {% if error %}
+                    <small>Erro ao adicionar compra.</small>
                 {% endif %}
             </fieldset>
         </form>
     {% endif %}
+
+    <script src="{{ url_for('static', filename='js/add.js') }}"></script>
 {% endblock %}
