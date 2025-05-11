@@ -45,8 +45,8 @@ def main():
             user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72983e55"),
             name="Toto",
             email="toto@gmail.com",
-            password="11111111",
-            role="user")
+                password="11111111",
+                role="user")
 
         db.session.add_all([u1, u2, u3])
         db.session.commit()

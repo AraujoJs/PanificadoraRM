@@ -4,9 +4,11 @@ Script: Panificadora-RM/services
 Création: jojo, le 10/05/2025
 """
 import calendar
+import logging
 from datetime import datetime
+from app import db
 
-from flask import redirect, url_for
+from flask import flash, Flask
 from sqlalchemy import extract
 
 from app.interno.models import Compra, Fornecedor, FornecedorProdutos
@@ -23,6 +25,8 @@ def get_todos_fornecedores():
 def get_todos_produtos():
     return FornecedorProdutos.query.all()
 
+def get_compra(id):
+    return Compra.query.filter_by(id=id).first()
 
 def get_fornecedor(id):
     if id == "all":
@@ -56,6 +60,31 @@ def get_compras_mes(ano, mes):
         extract('month', Compra.data_compra) == int(mes)
     ).all()
 
+
+def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, preco_total):
+    compra = get_compra(compra_id)
+    if compra:
+        try:
+            data_compra_formated = datetime.strptime(data_compra, '%Y-%m-%d').date()
+            data_vencimento_formated = datetime.strptime(vencimento, '%Y-%m-%d').date()
+
+            # Verifique se as datas foram formatadas corretamente
+            print(f"Data de Compra formatada: {data_compra_formated}")
+            print(f"Data de Vencimento formatada: {data_vencimento_formated}")
+
+
+            compra.produto_id = produto_id
+            compra.data_compra = data_compra_formated
+            compra.validade = data_vencimento_formated
+            compra.quantidade = quantidade
+            compra.preco_unitario = float(preco_total) / float(quantidade)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar compra: {str(e)}")
+            return False
+    return False
 
 def calcular_total(compras):
     total = 0.0
@@ -100,3 +129,40 @@ def get_meses_disponiveis(ano):
 
 def meses_ate(mes):
     return [(i, calendar.month_name[i]) for i in range(1, mes + 1)]
+
+def delete_compra(compra_id):
+    compra = get_compra(compra_id)
+    if compra:
+        try:
+            db.session.delete(compra)
+            db.session.commit()
+            logging.log(1, f"Compra deletada com sucesso: {compra_id}")
+            return True
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao deletar compra: {str(e)}")
+            return False
+    else:
+        flash("Compra não encontrada.")
+        return False
+
+def adicionar_compra(produto_id, data_compra, data_vencimento, quantidade, preco_total):
+    data_compra_formated = datetime.strptime(data_compra, '%Y-%m-%d').date()
+    data_vencimento_formated = datetime.strptime(data_vencimento, '%Y-%m-%d').date()
+    preco_unitario = float(preco_total)/float(quantidade)
+    compra = Compra(
+        produto_id = produto_id,
+        data_compra = data_compra_formated,
+        validade = data_vencimento_formated,
+        quantidade = quantidade,
+        preco_unitario = preco_unitario
+    )
+    try:
+        db.session.add(compra)
+        db.session.commit()
+        logging.log(1, f"Compra adicionada no banco de dados:{compra.id}")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erro ao adicionar no banco de dados: {str(e)}")
+    return False

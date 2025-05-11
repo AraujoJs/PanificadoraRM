@@ -8,6 +8,7 @@
         <th>Validade</th>
         <th>Quantidade</th>
         <th>Preço total</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -19,10 +20,19 @@
             <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
             <td>{{ i.quantidade }}</td>
             <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
+            <td>
+                <a href="{{ url_for('interno.compras_delete', compra_id=i.id) }}"
+                   onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
+                    Excluir
+                </a>
+                <a href="{{ url_for('interno.compras_update', compra_id=i.id) }}">
+                    | Editar
+                </a>
+            </td>
         </tr>
     {% endfor %}
     <tr>
-        <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
+        <td colspan="6" style="text-align: right;"><strong>Total:</strong></td>
         <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
     </tr>
     </tbody>

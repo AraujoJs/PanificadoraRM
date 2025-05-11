@@ -42,11 +42,79 @@ def compras():
         context["mes_selected"] = None
     return render_template("interno.html", **context)
 
+
 @interno.route('/compras/add', methods=["GET", "POST"])
 def compras_add():
     if request.method == "GET":
-        return render_template('compras_add.html', mode="add")
+        context = {
+            "mode": "add",
+            "produtos": get_todos_produtos()
+        }
+        return render_template('compras_add.html', **context)
 
+    produto_id = request.form['produto_id']
+    data_compra = request.form['data_compra']
+    data_vencimento = request.form['data_vencimento']
+    quantidade = request.form['quantidade']
+    preco_total = request.form['preco_total']
+    context = {
+        "produto_id": produto_id,
+        "data_compra": data_compra,
+        "data_vencimento": data_vencimento,
+        "quantidade": quantidade,
+        "preco_total": preco_total,
+    }
+    sucesso = adicionar_compra(**context)
+    if sucesso:
+        return redirect(url_for('interno.compras'))
+    else:
+        context = {
+            "mode": "add",
+            "produtos": get_todos_produtos(),
+            "error": True
+        }
+        return render_template(**context)
+
+
+@interno.route('/compras/delete/<int:compra_id>')
+def compras_delete(compra_id):
+    sucesso = delete_compra(compra_id)
+
+    if not sucesso:
+        flash(f"Erro ao deletar compra!")
+    return redirect(url_for('interno.compras'))
+
+
+@interno.route('/compras/update/<int:compra_id>', methods=['GET', 'POST'])
+def compras_update(compra_id):
+    if request.method == 'GET':
+        compra = get_compra(compra_id)
+        if compra:
+            context = {
+                "mode": "update",
+                "compra_id": compra_id,
+                "produtos": get_todos_produtos(),
+                "data_compra": compra.data_compra,
+                "data_vencimento": compra.validade,
+                "product_selected": compra.produto_id,
+                "quantidade": compra.quantidade,
+                "preco_total": compra.preco_total
+            }
+            return render_template('compras_add.html', **context)
+        flash("Compra inexistente!")
+    elif request.method == 'POST':
+        context = {
+            "compra_id": request.form['compra_id'],
+            "produto_id": request.form['produto_id'],
+            "data_compra": request.form['data_compra'],
+            "vencimento": request.form['data_vencimento'],
+            "quantidade": request.form['quantidade'],
+            "preco_total": request.form['preco_total']
+        }
+        sucesso = update_compra(**context)
+        if not sucesso:
+            flash("Falha ao atualizar venda.")
+        return redirect(url_for('interno.compras'))
 
 
 @interno.route('/compras/fornecedor/<id>')
