@@ -224,7 +224,8 @@ def adicionar_produto(fornecedor, nome, tipo):
 
 
 def adicionar_fornecedor(nome, contato, categoria):
-    fornecedor = Fornecedor(nome=nome, contato=contato, categoria=get_categoria(categoria))
+    categoria = get_categoria(int(categoria))
+    fornecedor = Fornecedor(nome=nome, contato=contato, categoria=categoria['nome'])
     try:
         db.session.add(fornecedor)
         db.session.commit()
