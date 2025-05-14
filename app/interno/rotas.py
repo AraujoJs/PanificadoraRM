@@ -5,6 +5,7 @@ Création: jojo, le 07/05/2025
 """
 # Imports
 import locale
+from crypt import methods
 
 from app.interno.services import *
 
@@ -46,9 +47,16 @@ def compras():
 @interno.route('/compras/add', methods=["GET", "POST"])
 def compras_add():
     if request.method == "GET":
+        de = request.args.get('de')
+        produto_id = request.args.get('id')
+        if produto_id:
+            produto = get_produto(int(produto_id))
+        else:
+            produto = None
         context = {
             "mode": "add",
-            "produtos": get_todos_produtos()
+            "produtos": get_todos_produtos(),
+            "produto_selected": produto
         }
         return render_template('compras_add.html', **context)
 
@@ -133,7 +141,7 @@ def compras_por_fornecedor(id):
     return redirect(url_for("interno.compras"))
 
 
-@interno.route('/compras/produto/<produto_id>')
+@interno.route('/compras/produtos/<produto_id>')
 def compras_por_produto(produto_id):
     produto = get_produto(produto_id)
     if produto:
@@ -148,6 +156,90 @@ def compras_por_produto(produto_id):
         return render_template('interno.html', **context)
     return redirect(url_for("interno.compras"))
 
+
+@interno.route('/compras/produtos/add')
+def add_produto_view():
+    is_redirected = request.args.get('de')
+    fornecedor_id = request.args.get('id')
+    if fornecedor_id:
+        fornecedor_selected = get_fornecedor(int(fornecedor_id))
+    else:
+        fornecedor_selected = None
+    context = {
+        'from': is_redirected,
+        'mode': 'add',
+        'fornecedores': get_todos_fornecedores(),
+        'fornecedor_selected': fornecedor_selected,
+        'tipos': get_tipos_produtos()
+    }
+    return render_template('produtos_add.html', **context)
+
+@interno.route('/compras/produtos/add', methods=['POST'])
+def add_produto():
+    is_redirected = request.form['from']
+    fornecedor_id = request.form['fornecedor_id']
+    fornecedor = get_fornecedor(int(fornecedor_id))
+
+    nome = request.form['nome']
+    tipo = get_tipo_produto(int(request.form['tipo_id']))
+
+
+    context = {
+        "fornecedor": fornecedor,
+        "nome": nome,
+        "tipo": tipo
+    }
+
+    produto = adicionar_produto(**context)
+    if produto:
+        if is_redirected:
+            url = get_url_para(is_redirected, produto.id)
+            return redirect(url)
+    redirect(url_for('interno.compras'))
+
+@interno.route('/compras/fornecedor/add', methods=['GET'])
+def add_fornecedor_view():
+    is_redirected = request.args.get('from')
+
+    context = {
+        'from': is_redirected,
+        'mode': 'add',
+        'categorias': get_todas_categorias()
+    }
+    return render_template('fornecedores_add.html', **context)
+
+@interno.route('/compras/fornecedor/add', methods=['POST'])
+def add_fornecedor():
+    is_redirected = request.form['from']
+    nome = request.form['nome']
+    contato = request.form['contato']
+    categoria = request.form['categoria']
+
+    context = {
+        'nome': nome,
+        'contato': contato,
+        'categoria': categoria,
+    }
+    fornecedor = adicionar_fornecedor(**context)
+    if fornecedor:
+        if is_redirected:
+            url = get_url_para(is_redirected, fornecedor.id)
+            return redirect(url)
+    return render_template('fornecedores_add.html', **context)
+
+
+
+
+def get_url_para(is_redirected, id):
+    """Compra, produto"""
+    if is_redirected == 'compras':
+        return url_for('interno.compras_add', id=id, de="produtos")
+    elif is_redirected == 'produtos':
+        return url_for('interno.add_produto_view', id=id, de="fornecedor")
+    elif is_redirected == 'fornecedor':
+        return url_for('interno.compras_add', id=id, de="produtos")
+    else:
+        return url_for('interno.compras')
 
 @interno.route('/compras/periodo/<ano>')
 def compras_periodo_ano(ano):

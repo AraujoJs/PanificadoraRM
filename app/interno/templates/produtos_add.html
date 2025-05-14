@@ -1,56 +1,38 @@
 {% extends 'layout_interno.html' %}
-{% block title %} {{ super() }} - Site Map{% endblock %}
+{% block title %} {{ super() }} - Produtos{% endblock %}
 {% block main %}
 
     {% if mode == 'add' %}
-        <h2>Adicionar uma compra</h2>
-        <form method="post" action="/interno/compras/add">
-            <label>Produto
-                {% if not produtos %}
-                    <br><a>Adicionar primeiro produto</a>
-                {% else %}
-                    <select name="produto_id" id="produtos" required>
-                        <option value="">Selecionar</option>
-                        {% for p in produtos %}
-                            <option value="{{ p.id }}"{% if produto_selected.id == p.id %} selected{% endif %}>
-                                {{ p.nome }}
-                            </option>
-                        {% endfor %}
-                        <option value="add">-- Novo produto --</option>
-                    </select>
-                {% endif %}
-            </label><br>
+        <h2>Adicionar um produto</h2>
+        <form method="POST" action="/interno/compras/produtos/add">
+            <input type="hidden" name="from" value="{{ from }}" required>
+            <label>Fornecedor
+                <select name="fornecedor_id" id="fornecedores" required>
+                    <option value="">Selecionar</option>
+                    {% for f in fornecedores %}
+                        <option value="{{ f.id }}"
+                                {% if fornecedor_selected.id == f.id %}selected{% endif %}>{{ f.nome }}
+                        </option>
+                    {% endfor %}
+                    <option value="add">-- Novo Fornecedor --</option>
 
-            <fieldset>
-                <legend>Informations sobre a compra</legend>
-
-                <label>Data de Compra
-                    <input type="date" name="data_compra" id="data-compra" required>
-                </label>
-
-                <label id="container-vencimento">Data de Vencimento
-                    <input type="date" id="data-vencimento" name="data_vencimento" required>
-                </label>
-                <br>
-
-                <label>Quantidade
-                    <input type="number" id="quantity" min="1" name="quantidade" required>
-                </label>
-                <br>
-
-                <label>Preço total <input type="number" min="0.00" step="any" max="20000.00" id="preco-total"
-                                          name="preco_total" placeholder="Total: R$ 00,00" required>
-                </label>
-                <span id="preco-total-visor">Total:</span>
-                <br>
-
-                <button>Adicionar</button>
-                <a href="{{ url_for('interno.compras') }}" class="btn btn-secondary">Cancelar</a>
-
-                {% if error %}
-                    <small>Erro ao adicionar compra.</small>
-                {% endif %}
-            </fieldset>
+                </select>
+            </label>
+            <br>
+            <label>Nome
+                <input type="text" name="nome" id="nome" required>
+            </label>
+            <br>
+            <label>Tipo
+                <select name="tipo_id" id="tipos" required>
+                    <option value="">Selecionar</option>
+                    {% for t in tipos %}
+                        <option value="{{ t.id }}">{{ t.nome }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <br>
+            <button type="submit">Adicionar</button>
         </form>
     {% elif mode == "update" %}
         <h2>Atualizar compra n° {{ compra_id }}</h2>

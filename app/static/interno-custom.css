@@ -1,3 +1,7 @@
+body {
+    max-width: 1000px;
+}
+
 .dot {
     height: 15px;
     width: 15px;

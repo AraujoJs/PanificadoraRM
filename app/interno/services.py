@@ -6,17 +6,56 @@ Création: jojo, le 10/05/2025
 import calendar
 import logging
 from datetime import datetime
-from app import db
 
-from flask import flash, Flask
+from flask import flash
 from sqlalchemy import extract
 
+from app import db
 from app.interno.models import Compra, Fornecedor, FornecedorProdutos
+
+CATEGORIAS = [
+    {"id": 1, "nome": "Insumos de Produção"},
+    {"id": 2, "nome": "Bebidas"},
+    {"id": 3, "nome": "Produtos para Revenda"},
+    {"id": 4, "nome": "Materiais de Embalagem"},
+    {"id": 5, "nome": "Produtos de Limpeza"},
+    {"id": 6, "nome": "Descartáveis e Higiene"},
+    {"id": 7, "nome": "Outros"}
+]
+
+TIPOS = [
+    {"id": 1, "nome": "Ingrediente"},
+    {"id": 2, "nome": "Bebida"},
+    {"id": 3, "nome": "Produto de Limpeza"},
+    {"id": 4, "nome": "Embalagem"},
+    {"id": 5, "nome": "Descartável"},
+    {"id": 6, "nome": "Produto para Revenda"},
+    {"id": 7, "nome": "Utensílio"},
+    {"id": 8, "nome": "Outros"}
+]
 
 
 def get_todas_compras():
     return Compra.query.all()
 
+
+def get_todas_categorias():
+    return CATEGORIAS
+
+def get_categoria(id):
+    for c in CATEGORIAS:
+        if c['id'] == id:
+            return c
+    return "Outro"
+
+def get_tipos_produtos():
+    return TIPOS
+
+def get_tipo_produto(tipo_id):
+    for t in TIPOS:
+        if t['id'] == tipo_id:
+            return t
+    return 'Outro'
 
 def get_todos_fornecedores():
     return Fornecedor.query.all()
@@ -25,8 +64,10 @@ def get_todos_fornecedores():
 def get_todos_produtos():
     return FornecedorProdutos.query.all()
 
+
 def get_compra(id):
     return Compra.query.filter_by(id=id).first()
+
 
 def get_fornecedor(id):
     if id == "all":
@@ -72,7 +113,6 @@ def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, pr
             print(f"Data de Compra formatada: {data_compra_formated}")
             print(f"Data de Vencimento formatada: {data_vencimento_formated}")
 
-
             compra.produto_id = produto_id
             compra.data_compra = data_compra_formated
             compra.validade = data_vencimento_formated
@@ -85,6 +125,7 @@ def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, pr
             flash(f"Erro ao atualizar compra: {str(e)}")
             return False
     return False
+
 
 def calcular_total(compras):
     total = 0.0
@@ -102,7 +143,6 @@ def ano_valido(ano):
 def mes_valido(ano, mes):
     if ano == "all" or mes == "all":
         return False
-
 
     if int(ano) == datetime.today().year:
         return int(mes) <= datetime.today().month
@@ -130,6 +170,7 @@ def get_meses_disponiveis(ano):
 def meses_ate(mes):
     return [(i, calendar.month_name[i]) for i in range(1, mes + 1)]
 
+
 def delete_compra(compra_id):
     compra = get_compra(compra_id)
     if compra:
@@ -146,16 +187,17 @@ def delete_compra(compra_id):
         flash("Compra não encontrada.")
         return False
 
+
 def adicionar_compra(produto_id, data_compra, data_vencimento, quantidade, preco_total):
     data_compra_formated = datetime.strptime(data_compra, '%Y-%m-%d').date()
     data_vencimento_formated = datetime.strptime(data_vencimento, '%Y-%m-%d').date()
-    preco_unitario = float(preco_total)/float(quantidade)
+    preco_unitario = float(preco_total) / float(quantidade)
     compra = Compra(
-        produto_id = produto_id,
-        data_compra = data_compra_formated,
-        validade = data_vencimento_formated,
-        quantidade = quantidade,
-        preco_unitario = preco_unitario
+        produto_id=produto_id,
+        data_compra=data_compra_formated,
+        validade=data_vencimento_formated,
+        quantidade=quantidade,
+        preco_unitario=preco_unitario
     )
     try:
         db.session.add(compra)
@@ -166,3 +208,28 @@ def adicionar_compra(produto_id, data_compra, data_vencimento, quantidade, preco
         db.session.rollback()
         flash(f"Erro ao adicionar no banco de dados: {str(e)}")
     return False
+
+def adicionar_produto(fornecedor, nome, tipo):
+    produto = FornecedorProdutos(fornecedor_id=fornecedor.id, nome=nome, tipo=tipo['nome'])
+    print(produto)
+    try:
+        db.session.add(produto)
+        db.session.commit()
+        logging.info("Fornecedor adicionado ao banco de dados.")
+        return produto
+    except Exception as e:
+        flash(f"Erro ao adicionar fornecedor ao banco de dados: {str(e)}")
+        return None
+
+
+
+def adicionar_fornecedor(nome, contato, categoria):
+    fornecedor = Fornecedor(nome=nome, contato=contato, categoria=get_categoria(categoria))
+    try:
+        db.session.add(fornecedor)
+        db.session.commit()
+        return fornecedor
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erro ao inserir o fornecedor {fornecedor.id} no db: {str(e)}")
+        return None

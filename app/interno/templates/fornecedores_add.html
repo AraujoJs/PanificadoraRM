@@ -1,56 +1,30 @@
 {% extends 'layout_interno.html' %}
-{% block title %} {{ super() }} - Site Map{% endblock %}
+{% block title %} {{ super() }} - Produtos{% endblock %}
 {% block main %}
 
     {% if mode == 'add' %}
-        <h2>Adicionar uma compra</h2>
-        <form method="post" action="/interno/compras/add">
-            <label>Produto
-                {% if not produtos %}
-                    <br><a>Adicionar primeiro produto</a>
-                {% else %}
-                    <select name="produto_id" id="produtos" required>
-                        <option value="">Selecionar</option>
-                        {% for p in produtos %}
-                            <option value="{{ p.id }}"{% if produto_selected.id == p.id %} selected{% endif %}>
-                                {{ p.nome }}
-                            </option>
-                        {% endfor %}
-                        <option value="add">-- Novo produto --</option>
-                    </select>
-                {% endif %}
-            </label><br>
-
-            <fieldset>
-                <legend>Informations sobre a compra</legend>
-
-                <label>Data de Compra
-                    <input type="date" name="data_compra" id="data-compra" required>
-                </label>
-
-                <label id="container-vencimento">Data de Vencimento
-                    <input type="date" id="data-vencimento" name="data_vencimento" required>
-                </label>
-                <br>
-
-                <label>Quantidade
-                    <input type="number" id="quantity" min="1" name="quantidade" required>
-                </label>
-                <br>
-
-                <label>Preço total <input type="number" min="0.00" step="any" max="20000.00" id="preco-total"
-                                          name="preco_total" placeholder="Total: R$ 00,00" required>
-                </label>
-                <span id="preco-total-visor">Total:</span>
-                <br>
-
-                <button>Adicionar</button>
-                <a href="{{ url_for('interno.compras') }}" class="btn btn-secondary">Cancelar</a>
-
-                {% if error %}
-                    <small>Erro ao adicionar compra.</small>
-                {% endif %}
-            </fieldset>
+        <h2>Adicionar um fornecedor</h2>
+        <form method="POST" action="/interno/compras/fornecedor/add">
+            {% if from %}
+                <input type="hidden" name="from" value="{{ from }}">
+            {% endif %}
+            <label>Nome
+                <input type="text" name="nome" id="nome" required>
+            </label>
+            <br>
+            <label>Contato
+                <input type="text" name="contato" id="contato" placeholder="(00)00000-0000" />
+            </label>
+            <br>
+            <label>Categoria
+                <select name="categoria" id="categoria">
+                    {% for c in categorias %}
+                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <br>
+        <button>Adicionar</button>
         </form>
     {% elif mode == "update" %}
         <h2>Atualizar compra n° {{ compra_id }}</h2>
@@ -97,4 +71,6 @@
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/add.js') }}"></script>
+    <script src="https://unpkg.com/imask"></script>
+
 {% endblock %}

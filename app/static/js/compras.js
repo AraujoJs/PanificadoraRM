@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         produtoSelect.addEventListener('change', function () {
             const produtoId = this.value;
             if (produtoId) {
-                window.location.href = `/interno/compras/produto/${produtoId}`;
+                window.location.href = `/interno/compras/produtos/${produtoId}`;
             }
         });
     }
