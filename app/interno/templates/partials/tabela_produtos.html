@@ -11,21 +11,23 @@
     </thead>
     <tbody>
     {% for i in itens %}
-        <tr>
-            <td>{{ i.id }}</td>
-            <td>{{ i.nome }}</td>
-            <td>{{ i.tipo }}</td>
-            <td style="text-align: right">{{ i.fornecedor }}</td>
-                    <td>
-                <a href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
-                   onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
-                    Excluir
-                </a>
-                <a href="{{ url_for('interno.produto_update', produto_id=i.id) }}">
-                    | Editar
-                </a>
-            </td>
-        </tr>
+        {% if i.ativo %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.nome }}</td>
+                <td>{{ i.tipo }}</td>
+                <td style="text-align: right">{{ i.fornecedor }}</td>
+                <td>
+                    <a href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
+                       onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
+                        Excluir
+                    </a>
+                    <a href="{{ url_for('interno.produto_update', produto_id=i.id) }}">
+                        | Editar
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
     {% endfor %}
     </tbody>
 </table>

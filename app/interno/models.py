@@ -16,7 +16,7 @@ class Fornecedor(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     contato = db.Column(db.String(100))
     categoria = db.Column(db.String(50)) # Ex: bebidas, embalagens, ingredientes
-    is_ativo = db.Column(db.Boolean, default=True)
+    ativo = db.Column(db.Boolean, default=True)
 
     produtos = db.relationship('FornecedorProdutos', backref='fornecedor', lazy=True)
     def __repr__(self):

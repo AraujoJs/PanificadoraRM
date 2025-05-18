@@ -98,8 +98,15 @@ def produto_delete(produto_id):
 
     if not sucesso:
         flash(f"Erro ao desativar produto!")
-    return redirect(url_for('interno.compras'))
+    return redirect(url_for('interno.produtos'))
 
+@interno.route('/compras/fornecedores/delete/<int:fornecedor_id>')
+def fornecedor_delete(fornecedor_id):
+    sucesso = desativar_fornecedor(fornecedor_id)
+
+    if not sucesso:
+        flash(f"Erro ao desativar produto!")
+    return redirect(url_for('interno.fornecedores'))
 
 @interno.route('/compras/update/<int:compra_id>', methods=['GET', 'POST'])
 def compras_update(compra_id):
@@ -160,6 +167,31 @@ def produto_update(produto_id):
         if not sucesso:
             flash("Falha ao atualizar produto.")
         return redirect(url_for('interno.produtos'))
+
+@interno.route('/compras/fornecedores/update/<int:fornecedor_id>', methods=['GET', 'POST'])
+def fornecedor_update(fornecedor_id):
+    if request.method == 'GET':
+        fornecedor = get_fornecedor(fornecedor_id)
+        if fornecedor:
+            context = {
+                "mode": "update",
+                "categorias": get_todas_categorias(),
+                "fornecedor": fornecedor
+            }
+            return render_template('fornecedores_add.html', **context)
+        flash("Compra inexistente!")
+    elif request.method == 'POST':
+        categoria = get_categoria(request.form['categoria'])
+        context = {
+            "fornecedor_id": request.form['fornecedor_id'],
+            "nome": request.form['nome'],
+            "contato": request.form['contato'],
+            "categoria": categoria
+        }
+        sucesso = update_fornecedor(**context)
+        if not sucesso:
+            flash("Falha ao atualizar fornecedor.")
+        return redirect(url_for('interno.fornecedores'))
 
 
 @interno.route('/compras/fornecedor/<id>')
@@ -243,10 +275,6 @@ def add_produto():
     is_redirected = request.form['from']
     if is_redirected == 'None':
         is_redirected = None
-
-
-
-
 
 
 @interno.route('/compras/fornecedor/add', methods=['GET'])

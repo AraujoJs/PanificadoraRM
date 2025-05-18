@@ -15,6 +15,15 @@
             <td>{{ i.nome }}</td>
             <td>{{ i.contato }}</td>
             <td>{{ i.categoria }}</td>
+            <td>
+                <a href="{{ url_for('interno.fornecedor_delete', fornecedor_id=i.id) }}"
+                   onclick="return confirm('Tem certeza que deseja excluir este fornecedor?')">
+                    Excluir
+                </a>
+                <a href="{{ url_for('interno.fornecedor_update', fornecedor_id=i.id) }}">
+                    | Editar
+                </a>
+            </td>
         </tr>
     {% endfor %}
     </tbody>

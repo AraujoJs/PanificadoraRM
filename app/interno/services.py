@@ -44,7 +44,7 @@ def get_todas_categorias():
 
 def get_categoria(id):
     for c in CATEGORIAS:
-        if c['id'] == id:
+        if c['id'] == int(id):
             return c
     return "Outro"
 
@@ -156,6 +156,21 @@ def calcular_total(compras):
         total += c.preco_total
     return total
 
+def update_fornecedor(fornecedor_id, nome, contato, categoria):
+    fornecedor: Fornecedor = get_fornecedor(fornecedor_id)
+    if fornecedor:
+        try:
+            fornecedor.nome = nome
+            fornecedor.contato = contato
+            fornecedor.categoria = categoria['nome']
+            db.session.commit()
+            logging.info(f"Fornecedor {fornecedor.id} atualizado com sucesso!")
+            return True
+        except Exception as e:
+            flash(f"Erro ao atualizar o fornecedor {fornecedor.id}: {str(e)}")
+            return False
+    flash("Fornecedor não encontrado.")
+    return False
 
 def ano_valido(ano):
     if ano == "all":
@@ -245,7 +260,7 @@ def adicionar_produto(fornecedor, nome, tipo):
         return None
 
 def desativar_produto(produto_id):
-    produto = FornecedorProdutos.query.filter_by(produto_id).first()
+    produto = get_produto(produto_id)
     if produto:
         try:
             produto.ativo = False
@@ -256,6 +271,20 @@ def desativar_produto(produto_id):
             flash(f"Erro ao desativar produto: {str(e)}")
             return False
     flash(f"produto_id invalido! Produto não encontrado.")
+    return False
+
+def desativar_fornecedor(fornecedor_id):
+    fornecedor = get_fornecedor(fornecedor_id)
+    if fornecedor:
+        try:
+            fornecedor.ativo = False
+            db.session.commit()
+            logging.info(f"Fornecedor desativado com sucesso! {fornecedor.nome}")
+            return True
+        except Exception as e:
+            flash(f"Erro ao desativar fornecedor: {str(e)}")
+            return False
+    flash(f"fornecedor_id invalido! Fornecedor não encontrado.")
     return False
 
 def adicionar_fornecedor(nome, contato, categoria):
