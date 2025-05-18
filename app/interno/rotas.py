@@ -5,7 +5,6 @@ Création: jojo, le 07/05/2025
 """
 # Imports
 import locale
-from crypt import methods
 
 from app.interno.services import *
 
@@ -24,11 +23,31 @@ def home():
 @interno.route('/compras')
 def compras():
     filtro = request.args.get("filtro")
+    sort = request.args.get('sort', 'id')
+    order = request.args.get('order', "asc")
+
     compras = get_todas_compras()
+
+    reverse = order == "desc"
+    if sort == "id":
+        compras.sort(key=lambda x: x.id, reverse=reverse)
+    elif sort == "produto":
+        compras.sort(key=lambda x: x.produto.nome.lower(), reverse=reverse)
+    elif sort == "data":
+        compras.sort(key=lambda x: x.data_compra, reverse=reverse)
+    elif sort == "validade":
+        compras.sort(key=lambda x: x.validade, reverse=reverse)
+    elif sort == "quantidade":
+        compras.sort(key=lambda x: x.quantidade, reverse=reverse)
+    elif sort == "preco_total":
+        compras.sort(key=lambda x: x.preco_total, reverse=reverse)
+
     context = {
         "tela": "compras",
         "itens": compras,
-        "total": calcular_total(compras)
+        "total": calcular_total(compras),
+        "sort": sort,
+        "order": order
     }
     if filtro == "fornecedor":
         context["fornecedores"] = get_todos_fornecedores()
@@ -92,6 +111,7 @@ def compras_delete(compra_id):
         flash(f"Erro ao deletar compra!")
     return redirect(url_for('interno.compras'))
 
+
 @interno.route('/compras/produtos/delete/<int:produto_id>')
 def produto_delete(produto_id):
     sucesso = desativar_produto(produto_id)
@@ -100,6 +120,7 @@ def produto_delete(produto_id):
         flash(f"Erro ao desativar produto!")
     return redirect(url_for('interno.produtos'))
 
+
 @interno.route('/compras/fornecedores/delete/<int:fornecedor_id>')
 def fornecedor_delete(fornecedor_id):
     sucesso = desativar_fornecedor(fornecedor_id)
@@ -107,6 +128,7 @@ def fornecedor_delete(fornecedor_id):
     if not sucesso:
         flash(f"Erro ao desativar produto!")
     return redirect(url_for('interno.fornecedores'))
+
 
 @interno.route('/compras/update/<int:compra_id>', methods=['GET', 'POST'])
 def compras_update(compra_id):
@@ -167,6 +189,7 @@ def produto_update(produto_id):
         if not sucesso:
             flash("Falha ao atualizar produto.")
         return redirect(url_for('interno.produtos'))
+
 
 @interno.route('/compras/fornecedores/update/<int:fornecedor_id>', methods=['GET', 'POST'])
 def fornecedor_update(fornecedor_id):
@@ -243,6 +266,7 @@ def add_produto_view():
     else:
         flash("Endpoint desconhecido!")
 
+
 @interno.route('/compras/produtos/add', methods=['POST'])
 def add_produto():
     fornecedor_id = request.form['fornecedor_id']
@@ -270,8 +294,6 @@ def add_produto():
     flash("Falha ao adicionar produto!")
     return redirect(url_for('interno.produtos'))
 
-
-
     is_redirected = request.form['from']
     if is_redirected == 'None':
         is_redirected = None
@@ -287,6 +309,7 @@ def add_fornecedor_view():
         'categorias': get_todas_categorias()
     }
     return render_template('fornecedores_add.html', **context)
+
 
 @interno.route('/compras/fornecedor/add', methods=['POST'])
 def add_fornecedor():
@@ -314,8 +337,6 @@ def add_fornecedor():
     return redirect(url_for('interno.fornecedores'))
 
 
-
-
 def get_url_para(is_redirected, id):
     """Compra, produto"""
     if is_redirected == 'compras':
@@ -326,6 +347,7 @@ def get_url_para(is_redirected, id):
         return url_for('interno.compras_add', id=id, de="produtos")
     else:
         return url_for('interno.compras')
+
 
 @interno.route('/compras/periodo/<ano>')
 def compras_periodo_ano(ano):
@@ -369,18 +391,54 @@ def compras_periodo_mes(ano, mes):
 
 @interno.route('/produtos')
 def produtos():
+    ordenar = request.args.get("ordenar", "id")
+    ordem = request.args.get("ordem", "asc")
+
+    produtos = get_todos_produtos()
+    produtos = [p for p in produtos if p.ativo]
+
+    # Aplica ordenação
+    reverse = ordem == "desc"
+    try:
+        if ordenar == "fornecedor":
+            produtos = sorted(produtos, key=lambda x: x.fornecedor.nome, reverse=reverse)
+        else:
+            produtos = sorted(produtos, key=lambda x: getattr(x, ordenar), reverse=reverse)
+
+    except AttributeError:
+        pass  # caso a coluna não exista, não ordena
+
     context = {
         "tela": "produtos",
-        "itens": get_todos_produtos()
+        "itens": produtos,
+        "ordenar": ordenar,
+        "ordem": ordem
     }
     return render_template('interno.html', **context)
 
 
 @interno.route('/fornecedores')
 def fornecedores():
+    ordenar = request.args.get("ordenar", default="id")
+    ordem = request.args.get("ordem", default="asc")
+
+    fornecedores = get_todos_fornecedores()
+
+    reverse = ordem == "desc"
+    if ordenar == "id":
+        fornecedores.sort(key=lambda x: x.id, reverse=reverse)
+    elif ordenar == "nome":
+        fornecedores.sort(key=lambda x: x.nome.lower(), reverse=reverse)
+    elif ordenar == "contato":
+        fornecedores.sort(key=lambda x: x.contato.lower(), reverse=reverse)
+    elif ordenar == "categoria":
+        fornecedores.sort(key=lambda x: x.categoria.lower(), reverse=reverse)
+
     context = {
         "tela": "fornecedores",
-        "itens": get_todos_fornecedores()
+        "itens": fornecedores,
+        "ordenar": ordenar,
+        "ordem": ordem
     }
     return render_template('interno.html', **context)
 

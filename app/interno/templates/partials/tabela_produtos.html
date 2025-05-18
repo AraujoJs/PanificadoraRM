@@ -1,12 +1,33 @@
+{% macro flecha(coluna) -%}
+    {% if ordenar == coluna %}
+        {{ '↓' if ordem == 'desc' else '↑' }}
+    {% endif %}
+{%- endmacro %}
+
 <h2>Produtos cadastrados</h2>
 <table>
     <thead>
     <tr>
-        <th>Id</th>
-        <th>Nome</th>
-        <th>Tipo</th>
-        <th>Fornecedor</th>
-        <th></th>
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
+        <th><a href="{{ url_for('interno.produtos', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='nome', ordem=proxima_ordem) }}">Nome {{ flecha('nome') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'tipo' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='tipo', ordem=proxima_ordem) }}">Tipo {{ flecha('tipo') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'fornecedor' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='fornecedor', ordem=proxima_ordem) }}">Fornecedor {{ flecha('fornecedor') }}</a>
+        </th>
+
+        <th>Ações</th>
     </tr>
     </thead>
     <tbody>
