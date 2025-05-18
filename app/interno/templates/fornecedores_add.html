@@ -5,16 +5,11 @@
     {% if mode == 'add' %}
         <h2>Adicionar um fornecedor</h2>
         <form method="POST" action="/interno/compras/fornecedor/add">
-            {% if from %}
-                <input type="hidden" name="from" value="{{ from }}">
-            {% endif %}
-            <label>Nome
-                <input type="text" name="nome" id="nome" required>
-            </label>
+            <input type="hidden" name="endpoint" id="endpoint" value="{{ endpoint }}">
+
+            <label>Nome<input type="text" name="nome" id="nome" required></label>
             <br>
-            <label>Contato
-                <input type="text" name="contato" id="contato" placeholder="(00)00000-0000" />
-            </label>
+            <label>Contato<input type="text" name="contato" id="contato" placeholder="(00)00000-0000" /></label>
             <br>
             <label>Categoria
                 <select name="categoria" id="categoria">
