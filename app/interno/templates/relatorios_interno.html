@@ -1,6 +1,57 @@
 {% extends 'layout_interno.html' %}
 {% block title %}{{ super() }} - Site Map{% endblock %}
 {% block main %}
-    <h2>Em construção!</h2>
-    <p>Ainda esta em desenvolvimento... Volte mais tarde!</p>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Geral</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h1, h2 { text-align: center; }
+        .total { text-align: right; font-weight: bold; font-size: 1.2em; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Relatório Geral</h1>
+
+    <h2>Compras</h2>
+    <table>
+        <tr><th>Data</th><th>Produto</th><th>Quantidade</th><th>Valor</th></tr>
+        <tr><td>2025-05-20</td><td>Coca-Cola</td><td>10</td><td>R$ 300,00</td></tr>
+        <tr><td>2025-05-21</td><td>Cerveja<td>5</td><td>R$ 250,00</td></tr>
+    </table>
+
+    <h2>Fornecedores</h2>
+    <table>
+        <tr><th>Nome</th><th>CNPJ</th><th>Telefone</th></tr>
+        <tr><td>Coca-Cola</td><td>12.345.678/0001-90</td><td>(11) 99999-1234</td></tr>
+    </table>
+
+    <h2>Produtos</h2>
+    <table>
+        <tr><th>Produto</th><th>Categoria</th><th>Estoque</th><th>Preço Unitário</th></tr>
+        <tr><td>Coca-Cola</td><td>Bebida</td><td>50</td><td>R$ 30,00</td></tr>
+    </table>
+
+    <div class="total">
+        Valor Total: R$ 550,00
+    </div>
+</body>
+</html>
+
+<button onclick="window.print()">Gerar relatório</button>
+
+<style>
+    @media print {
+        button {
+            display: none;
+        }
+    }
+</style>
+
 {% endblock %}
+

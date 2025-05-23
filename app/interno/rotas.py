@@ -5,7 +5,6 @@ Création: jojo, le 07/05/2025
 """
 # Imports
 import locale
-from crypt import methods
 
 from app.interno.services import *
 

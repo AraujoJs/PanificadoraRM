@@ -1,10 +1,11 @@
-from flask import url_for, redirect
+from flask import url_for, redirect, Flask
 
-from app import create_app
+from app import create_app, config
 
 # Cria e roda a aplicação Flask
-app = create_app()
+app: Flask = create_app()
 app.config['SESSION_PERMANENT'] = False
+
 
 @app.route('/')
 def index():
@@ -13,5 +14,3 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
