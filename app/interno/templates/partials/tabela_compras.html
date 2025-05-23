@@ -2,12 +2,35 @@
 <table>
     <thead>
     <tr>
-        <th>Id</th>
-        <th>Produto</th>
-        <th>Data</th>
-        <th>Validade</th>
-        <th>Quantidade</th>
-        <th>Preço total</th>
+        <th>
+            <a href="{{ url_for('interno.compras', sort='id', order='asc' if sort != 'id' or order == 'desc' else 'desc') }}">
+                Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+            </a>
+        </th>
+
+        <th>
+            <a href="{{ url_for('interno.compras', sort='produto', order='asc' if sort != 'produto' or order == 'desc' else 'desc') }}">
+                Produtos {% if sort == 'produto' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('interno.compras', sort='data', order='asc' if sort != 'data' or order == 'desc' else 'desc') }}">
+                Data {% if sort == 'data' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('interno.compras', sort='validade', order='asc' if sort != 'validade' or order == 'desc' else 'desc') }}">
+                Validade {% if sort == 'validade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('interno.compras', sort='quantidade', order='asc' if sort != 'quantidade' or order == 'desc' else 'desc') }}">
+                Quantidade {% if sort == 'quantidade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}</a>
+        </th>
+        <th>
+            <a href="{{ url_for('interno.compras', sort='preco_total', order='asc' if sort != 'preco_total' or order == 'desc' else 'desc') }}">
+                Preço total {% if sort == 'preco_total' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+            </a></th>
         <th></th>
     </tr>
     </thead>

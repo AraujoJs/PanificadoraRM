@@ -5,14 +5,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const produtoSelect = document.getElementById('produtos');
     const fornecedorSelect = document.getElementById('fornecedores');
     const precoTotalVisor = document.getElementById('preco-total-visor');
-
+    const endpoint = document.getElementById('endpoint')
     const contatoInput = document.getElementById('contato');
 
     const precoTotal = document.getElementById('preco-total');
 
     if (contatoInput) {
         IMask(contatoInput, {
-           mask: '(00) 00000-0000'
+            mask: '(00) 00000-0000'
         });
     }
 
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const produtoId = this.value;
 
             if (produtoId === 'add') {
-                window.location.href = `/interno/compras/produtos/add?de=compras`;
+                window.location.href = `/interno/compras/produtos/add?end_point=compras`;
             } else if (produtoId) {
                 console.log(`Selecionado produto: ${produtoId}`);
                 // window.location.href = `/interno/compras/produtos/${produtoId}`;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const fornecedorId = this.value;
 
             if (fornecedorId === 'add') {
-                window.location.href = `/interno/compras/fornecedor/add?from=produtos`;
+                window.location.href = `/interno/compras/fornecedor/add?end_point=${endpoint.value}`;
             } else if (fornecedorId) {
                 console.log(`Selecionado fornecedor: ${fornecedorId}`);
                 // window.location.href = `/interno/compras/produtos/${produtoId}`;
@@ -64,15 +64,16 @@ document.addEventListener("DOMContentLoaded", function () {
             {style: "currency", currency: "BRL"})
     }
 
-
+if (precoTotal) {
     if (precoTotal.value) {
         precoTotalVisor.textContent = `Total: ${formatarMoeda(precoTotal.value)}`;
     }
+
     precoTotal.addEventListener('change', function () {
         const valor = formatarMoeda(this.value)
         precoTotalVisor.textContent = `Total: ${valor}`
-    })
-
+    });
+}
 })
 
 

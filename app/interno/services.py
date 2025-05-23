@@ -44,7 +44,7 @@ def get_todas_categorias():
 
 def get_categoria(id):
     for c in CATEGORIAS:
-        if c['id'] == id:
+        if c['id'] == int(id):
             return c
     return "Outro"
 
@@ -53,7 +53,13 @@ def get_tipos_produtos():
 
 def get_tipo_produto(tipo_id):
     for t in TIPOS:
-        if t['id'] == tipo_id:
+        if t['id'] == int(tipo_id):
+            return t
+    return 'Outro'
+
+def get_tipo_id(tipo_nome):
+    for t in TIPOS:
+        if t['nome'] == tipo_nome:
             return t
     return 'Outro'
 
@@ -126,13 +132,45 @@ def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, pr
             return False
     return False
 
-
+def update_produto(produto_id, fornecedor_id, nome, tipo_id):
+    produto: FornecedorProdutos = get_produto(produto_id)
+    if produto:
+        tipo = get_tipo_produto(tipo_id)
+        try:
+            produto.fornecedor_id = fornecedor_id
+            produto.nome = nome
+            produto.tipo = tipo['nome']
+            db.session.commit()
+            logging.info(f"Produto {produto_id} atualizado com sucesso!")
+            return True
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erro ao atualizar produto: {str(e)}")
+            return False
+    else:
+        flash("Produto não encontrado.")
+        return False
 def calcular_total(compras):
     total = 0.0
     for c in compras:
         total += c.preco_total
     return total
 
+def update_fornecedor(fornecedor_id, nome, contato, categoria):
+    fornecedor: Fornecedor = get_fornecedor(fornecedor_id)
+    if fornecedor:
+        try:
+            fornecedor.nome = nome
+            fornecedor.contato = contato
+            fornecedor.categoria = categoria['nome']
+            db.session.commit()
+            logging.info(f"Fornecedor {fornecedor.id} atualizado com sucesso!")
+            return True
+        except Exception as e:
+            flash(f"Erro ao atualizar o fornecedor {fornecedor.id}: {str(e)}")
+            return False
+    flash("Fornecedor não encontrado.")
+    return False
 
 def ano_valido(ano):
     if ano == "all":
@@ -221,7 +259,33 @@ def adicionar_produto(fornecedor, nome, tipo):
         flash(f"Erro ao adicionar fornecedor ao banco de dados: {str(e)}")
         return None
 
+def desativar_produto(produto_id):
+    produto = get_produto(produto_id)
+    if produto:
+        try:
+            produto.ativo = False
+            db.session.commit()
+            logging.info(f"Produto desativado com sucesso! {produto.nome}")
+            return True
+        except Exception as e:
+            flash(f"Erro ao desativar produto: {str(e)}")
+            return False
+    flash(f"produto_id invalido! Produto não encontrado.")
+    return False
 
+def desativar_fornecedor(fornecedor_id):
+    fornecedor = get_fornecedor(fornecedor_id)
+    if fornecedor:
+        try:
+            fornecedor.ativo = False
+            db.session.commit()
+            logging.info(f"Fornecedor desativado com sucesso! {fornecedor.nome}")
+            return True
+        except Exception as e:
+            flash(f"Erro ao desativar fornecedor: {str(e)}")
+            return False
+    flash(f"fornecedor_id invalido! Fornecedor não encontrado.")
+    return False
 
 def adicionar_fornecedor(nome, contato, categoria):
     categoria = get_categoria(int(categoria))

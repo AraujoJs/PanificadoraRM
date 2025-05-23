@@ -1,11 +1,32 @@
+{% macro flecha(coluna) -%}
+    {% if ordenar == coluna %}
+        {{ '↓' if ordem == 'desc' else '↑' }}
+    {% endif %}
+{%- endmacro %}
 <h2>Fornecedores cadastrados</h2>
 <table>
     <thead>
     <tr>
-        <th>Id</th>
-        <th>Nome</th>
-        <th>Contato</th>
-        <th>Categoria</th>
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
+        <th><a href="{{ url_for('interno.fornecedores', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.fornecedores', ordenar='nome', ordem=proxima_ordem) }}">Nome {{ flecha('nome') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'contato' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.fornecedores', ordenar='contato', ordem=proxima_ordem) }}">Contato {{ flecha('contato') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'categoria' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.fornecedores', ordenar='categoria', ordem=proxima_ordem) }}">Categoria {{ flecha('categoria') }}</a>
+        </th>
+
+        <th>Ações</th>
     </tr>
     </thead>
     <tbody>
@@ -15,6 +36,15 @@
             <td>{{ i.nome }}</td>
             <td>{{ i.contato }}</td>
             <td>{{ i.categoria }}</td>
+            <td>
+                <a href="{{ url_for('interno.fornecedor_delete', fornecedor_id=i.id) }}"
+                   onclick="return confirm('Tem certeza que deseja excluir este fornecedor?')">
+                    Excluir
+                </a>
+                <a href="{{ url_for('interno.fornecedor_update', fornecedor_id=i.id) }}">
+                    | Editar
+                </a>
+            </td>
         </tr>
     {% endfor %}
     </tbody>

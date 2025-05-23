@@ -4,13 +4,16 @@
     {% if tela == 'compras' %}
         {% include 'partials/filtros_compras.html' %}
         {% include 'partials/tabela_compras.html' %}
+        <a href="{{ url_for("interno.compras_add") }}">Nova Compra</a>
         <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
     {% elif tela == 'produtos' %}
         {% include 'partials/tabela_produtos.html' %}
+        <a href="{{ url_for('interno.add_produto_view', end_point='produtos') }}">Novo Produto</a>
         <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
     {% elif tela == 'fornecedores' %}
         {% include 'partials/tabela_fornecedores.html' %}
+        <a href="{{ url_for("interno.add_fornecedor_view") }}">Novo Fornecedor</a>
         <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
     {% endif %}
-    <a href="{{ url_for("interno.compras_add") }}">Nova Compra</a>
+
 {% endblock %}
