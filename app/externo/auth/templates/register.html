@@ -8,13 +8,13 @@
 <body>
 
 <div class="login-container">
-    <h2>Registro</h2>
+    <h2>Criar uma conta</h2>
     <form id="register-form">
         <input type="text" name="name" placeholder="Nome" required>
         <input type="email" name="email" placeholder="E-mail" required>
         <input type="password" name="password" placeholder="Senha" required>
         <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
-        <button class="button-send" type="submit">Registrar</button>
+        <button class="button-send" type="submit">Cadastrar</button>
     </form>
     <div class="links">
         Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
