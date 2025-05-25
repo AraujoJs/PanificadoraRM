@@ -27,7 +27,7 @@
             <a href="{{ url_for('interno.produtos', ordenar='fornecedor', ordem=proxima_ordem) }}">Fornecedor {{ flecha('fornecedor') }}</a>
         </th>
 
-        <th>Ações</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -37,8 +37,8 @@
                 <td>{{ i.id }}</td>
                 <td>{{ i.nome }}</td>
                 <td>{{ i.tipo }}</td>
-                <td style="text-align: right">{{ i.fornecedor }}</td>
-                <td>
+                <td>{{ i.fornecedor }}</td>
+                <td style="text-align: right">
                     <a href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
                        onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
                         Excluir

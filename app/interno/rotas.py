@@ -445,4 +445,18 @@ def fornecedores():
 
 @interno.route('/relatorio')
 def relatorio():
-    return render_template('relatorios_interno.html')
+    compras = get_todas_compras()
+    total = get_total_compras(compras)
+    context = {
+        "compras": compras,
+        "total": total
+    }
+
+    return render_template('relatorios_interno.html', **context)
+
+def get_total_compras(compras):
+    total = 0.0
+    for c in compras:
+        total += c.preco_total
+    return total
+

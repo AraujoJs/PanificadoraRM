@@ -43,7 +43,7 @@
             <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
             <td>{{ i.quantidade }}</td>
             <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
-            <td>
+            <td style="text-align: right">
                 <a href="{{ url_for('interno.compras_delete', compra_id=i.id) }}"
                    onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
                     Excluir
