@@ -7,23 +7,30 @@
     <title>Panificadora-RM</title>
 </head>
 <body>
-<div class="login-container">
-    <h2>Fazer login</h2>
-    <form id="login-form">
-        {% if message %}
-            <p class="error-message">{{ message }}</p>
-        {% endif %}
-        <input type="text" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Senha" required>
-        <button class="button-send" type="submit">Entrar</button>
-    </form>
-    <div class="links">
-        <a href="{{ url_for('auth.login_indentify') }}">Esqueci a senha</a>
-        <span> | </span>
-        <span>Não tem conta? </span><a href="{{ url_for('auth.register') }}">Cadastre-se</a>
+<div>
+    <div id="login-logo-container">
+    <div >
+        <img id="login-logo" src="{{ url_for('static', filename='assets/icon/logo-prm.png') }}">
     </div>
-</div>
+    </div>
+    <div class="login-container">
+        <h2>Fazer login</h2>
+        <form id="login-form">
+            {% if message %}
+                <p class="error-message">{{ message }}</p>
+            {% endif %}
+            <input type="text" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <button class="button-send" type="submit">Entrar</button>
+        </form>
+        <div class="links">
+            <a href="{{ url_for('auth.login_indentify') }}">Esqueci a senha</a>
+            <span> | </span>
+            <span>Não tem conta? </span><a href="{{ url_for('auth.register') }}">Cadastre-se</a>
+        </div>
+    </div>
 
+</div>
 <script>
     document.getElementById("login-form").addEventListener("submit", async (e) => {
         e.preventDefault();

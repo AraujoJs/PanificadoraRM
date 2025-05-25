@@ -8,6 +8,8 @@ body {
     margin: 0;
 }
 
+
+
 .login-container {
     background-color: #fff;
     padding: 2rem;
@@ -15,6 +17,17 @@ body {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     width: 300px;
     text-align: center;
+    margin: auto;
+}
+
+#login-logo {
+    width: 250px;
+}
+
+#login-logo-container {
+    margin: auto;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 

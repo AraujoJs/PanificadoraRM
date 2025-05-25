@@ -447,12 +447,22 @@ def fornecedores():
 def relatorio():
     compras = get_todas_compras()
     total = get_total_compras(compras)
+    anos = get_anos_disponiveis(compras)
+
+    ano_mes = get_atual_ano_mes(compras)
+    ano_atual = ano_mes['anos']
+    mes_atual = ano_mes['mes']
+    meses = get_meses_disponiveis(ano_atual)
     context = {
         "compras": compras,
-        "total": total
+        "total": total,
+        "anos": anos,
+        "meses": meses,
+        "ano_selected": ano_atual,
+        "mes_selected": mes_atual
     }
-
     return render_template('relatorios_interno.html', **context)
+
 
 def get_total_compras(compras):
     total = 0.0

@@ -172,6 +172,11 @@ def update_fornecedor(fornecedor_id, nome, contato, categoria):
     flash("Fornecedor não encontrado.")
     return False
 
+def get_atual_ano_mes(compras):
+    anos = get_anos_disponiveis(compras)
+    meses = get_meses_disponiveis(anos[-1])
+    return {"anos":anos[-1], "mes": meses[-1][1]}
+
 def ano_valido(ano):
     if ano == "all":
         return False

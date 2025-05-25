@@ -2,12 +2,19 @@ body {
     max-width: 1000px;
 }
 
+a {
+    text-decoration: none;
+}
+
 .dot {
     height: 15px;
     width: 15px;
     background-color: #bbb;
     border-radius: 50%;
     display: inline-block;
+}
+.space-end-icon {
+    margin-right: 5px;
 }
 
 .remove-margin-top {
