@@ -1,11 +1,26 @@
 {% extends 'layout_interno.html' %}
 {% block tilte %} {{ super() }} - Site Map{% endblock %}
+
 {% block main %}
     {% if tela == 'compras' %}
+        {% if filtro == "fornecedor" %}
+            {% set base_url = url_for('interno.compras_por_fornecedor', id=filtro_id) %}
+        {% elif filtro == 'produto' %}
+            {% set base_url = url_for('interno.compras_por_produto', produto_id=filtro_id) %}
+        {% elif ano_selected is defined and ano_selected %}
+            {% if mes_selected is defined and mes_selected and mes_selected != 'all' %}
+                {% set base_url = url_for('interno.compras_periodo_mes', ano=ano_selected, mes=mes_selected) %}
+            {% else %}
+                {% set base_url = url_for('interno.compras_periodo_ano', ano=ano_selected) %}
+            {% endif %}
+        {% else %}
+            {% set base_url = url_for('interno.compras') %}
+        {% endif %}
         {% include 'partials/filtros_compras.html' %}
         {% include 'partials/tabela_compras.html' %}
         <a href="{{ url_for("interno.compras_add") }}">Nova Compra</a>
         <script src="{{ url_for('static', filename='js/compras.js') }}"></script>
+
     {% elif tela == 'produtos' %}
         {% include 'partials/tabela_produtos.html' %}
         <a href="{{ url_for('interno.add_produto_view', end_point='produtos') }}">Novo Produto</a>

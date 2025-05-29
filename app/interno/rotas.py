@@ -23,10 +23,15 @@ def home():
 @interno.route('/compras')
 def compras():
     filtro = request.args.get("filtro")
+    fornecedor_id = request.args.get("fornecedor_id")
     sort = request.args.get('sort', 'id')
     order = request.args.get('order', "asc")
 
     compras = get_todas_compras()
+
+    if filtro == "fornecedor" and fornecedor_id:
+        compras = [c for c in compras_por_fornecedor(str(fornecedor_id))]
+
 
     reverse = order == "desc"
     if sort == "id":
@@ -47,7 +52,8 @@ def compras():
         "itens": compras,
         "total": calcular_total(compras),
         "sort": sort,
-        "order": order
+        "order": order,
+        "fornecedor_id": fornecedor_id
     }
     if filtro == "fornecedor":
         context["fornecedores"] = get_todos_fornecedores()
@@ -217,20 +223,45 @@ def fornecedor_update(fornecedor_id):
         return redirect(url_for('interno.fornecedores'))
 
 
-@interno.route('/compras/fornecedor/<id>')
+@interno.route('/compras/fornecedor/<int:id>')
 def compras_por_fornecedor(id):
     fornecedor = get_fornecedor(id)
-    if fornecedor:
-        compras = get_compras_fornecedor(fornecedor.id)
-        context = {
-            "tela": "compras",
-            "itens": compras,
-            "total": calcular_total(compras),
-            "fornecedores": get_todos_fornecedores(),
-            "fornecedor_selected": fornecedor
-        }
-        return render_template('interno.html', **context)
-    return redirect(url_for("interno.compras"))
+    if not fornecedor:
+        return redirect(url_for("interno.compras"))
+
+    compras = get_compras_fornecedor(fornecedor.id)
+
+    # 🟨 Pega os parâmetros de ordenação
+    sort = request.args.get("sort", "id")
+    order = request.args.get("order", "asc")
+    reverse = order == "desc"
+
+    # 🟩 Aplica ordenação
+    if sort == "id":
+        compras.sort(key=lambda x: x.id, reverse=reverse)
+    elif sort == "produto":
+        compras.sort(key=lambda x: x.produto.nome.lower(), reverse=reverse)
+    elif sort == "data":
+        compras.sort(key=lambda x: x.data_compra, reverse=reverse)
+    elif sort == "validade":
+        compras.sort(key=lambda x: x.validade, reverse=reverse)
+    elif sort == "quantidade":
+        compras.sort(key=lambda x: x.quantidade, reverse=reverse)
+    elif sort == "preco_total":
+        compras.sort(key=lambda x: x.preco_total, reverse=reverse)
+
+    context = {
+        "tela": "compras",
+        "itens": compras,
+        "total": calcular_total(compras),
+        "fornecedores": get_todos_fornecedores(),
+        "fornecedor_selected": fornecedor,
+        "sort": sort,
+        "order": order,
+        "filtro": "fornecedor",  # <- Adiciona isso
+        "filtro_id": fornecedor.id  # <- E isso também
+    }
+    return render_template('interno.html', **context)
 
 
 @interno.route('/compras/produtos/<produto_id>')
@@ -238,12 +269,36 @@ def compras_por_produto(produto_id):
     produto = get_produto(produto_id)
     if produto:
         compras = get_compras_produto(produto_id)
+
+        sort = request.args.get('sort', 'id')
+        order = request.args.get('order', 'asc')
+        reverse = order == "desc"
+
+        # Ordena conforme coluna e ordem
+        if sort == "id":
+            compras.sort(key=lambda x: x.id, reverse=reverse)
+        elif sort == "produto":
+            compras.sort(key=lambda x: x.produto.nome.lower(), reverse=reverse)
+        elif sort == "data":
+            compras.sort(key=lambda x: x.data_compra, reverse=reverse)
+        elif sort == "validade":
+            compras.sort(key=lambda x: x.validade, reverse=reverse)
+        elif sort == "quantidade":
+            compras.sort(key=lambda x: x.quantidade, reverse=reverse)
+        elif sort == "preco_total":
+            compras.sort(key=lambda x: x.preco_total, reverse=reverse)
+
         context = {
             "tela": "compras",
             "itens": compras,
             "total": calcular_total(compras),
             "produtos": get_todos_produtos(),
-            "produto_selected": produto
+            "produto_selected": produto,
+            "filtro": "produto",
+            "filtro_id": produto_id,
+            "produto_selected": produto,
+            "sort": request.args.get('sort', 'id'),
+            "order": request.args.get('order', 'asc')
         }
         return render_template('interno.html', **context)
     return redirect(url_for("interno.compras"))
@@ -354,13 +409,37 @@ def compras_periodo_ano(ano):
     if not ano_valido(ano):
         return redirect(url_for("interno.compras"))
     compras = get_compras_ano(ano)
+
+    sort = request.args.get('sort', 'id')
+    order = request.args.get('order', 'asc')
+    reverse = order == 'desc'
+
+    if sort == "id":
+        compras.sort(key=lambda x: x.id, reverse=reverse)
+    elif sort == "produto":
+        compras.sort(key=lambda x: x.produto.nome.lower(), reverse=reverse)
+    elif sort == "data":
+        compras.sort(key=lambda x: x.data_compra, reverse=reverse)
+    elif sort == "validade":
+        compras.sort(key=lambda x: x.validade, reverse=reverse)
+    elif sort == "quantidade":
+        compras.sort(key=lambda x: x.quantidade, reverse=reverse)
+    elif sort == "preco_total":
+        compras.sort(key=lambda x: x.preco_total, reverse=reverse)
+
     context = {
         "tela": "compras",
         "itens": compras,
         "total": calcular_total(compras),
         "anos": get_anos_disponiveis(compras),
         "ano_selected": int(ano),
-        "meses": get_meses_disponiveis(ano)
+        "meses": get_meses_disponiveis(ano),
+        "filtro": "periodo",            # filtro ativo
+        "filtro_id": int(ano),          # identificador para o filtro (ano)
+        "fornecedor_selected": None,    # garantir consistência no contexto
+        "produto_selected": None,
+        "sort": request.args.get('sort', 'id'),
+        "order": request.args.get('order', 'asc')
     }
     return render_template('interno.html', **context)
 
@@ -368,7 +447,7 @@ def compras_periodo_ano(ano):
 @interno.route('/compras/periodo/<ano>/<mes>')
 def compras_periodo_mes(ano, mes):
     if ano == "all":
-        return redirect("interno.compras")
+        return redirect(url_for("interno.compras"))
     if mes == "all":
         compras = get_compras_ano(ano)
         mes_selected = "all"
@@ -377,6 +456,25 @@ def compras_periodo_mes(ano, mes):
             return redirect(url_for("interno.compras"))
         compras = get_compras_mes(ano, mes)
         mes_selected = int(mes)
+
+    sort = request.args.get('sort', 'id')
+    order = request.args.get('order', 'asc')
+    reverse = order == 'desc'
+
+    if sort == "id":
+        compras.sort(key=lambda x: x.id, reverse=reverse)
+    elif sort == "produto":
+        compras.sort(key=lambda x: x.produto.nome.lower(), reverse=reverse)
+    elif sort == "data":
+        compras.sort(key=lambda x: x.data_compra, reverse=reverse)
+    elif sort == "validade":
+        compras.sort(key=lambda x: x.validade, reverse=reverse)
+    elif sort == "quantidade":
+        compras.sort(key=lambda x: x.quantidade, reverse=reverse)
+    elif sort == "preco_total":
+        compras.sort(key=lambda x: x.preco_total, reverse=reverse)
+
+
     context = {
         "tela": "compras",
         "itens": compras,
@@ -384,7 +482,13 @@ def compras_periodo_mes(ano, mes):
         "anos": get_anos_disponiveis(compras),
         "meses": get_meses_disponiveis(ano),
         "ano_selected": int(ano),
-        "mes_selected": mes_selected
+        "mes_selected": mes_selected,
+        "filtro": "periodo",
+        "filtro_id": (int(mes) if mes != "all" else "all"),  # para diferenciar filtro ativo
+        "fornecedor_selected": None,
+        "produto_selected": None,
+        "sort": request.args.get('sort', 'id'),
+        "order": request.args.get('order', 'asc')
     }
     return render_template('interno.html', **context)
 
