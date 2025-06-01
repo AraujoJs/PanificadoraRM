@@ -33,7 +33,7 @@ class FornecedorProdutos(db.Model):
 
     ativo = db.Column(db.Boolean, default=True)
 
-    compras = db.relationship('Compra', backref='produto', lazy=True)
+    compras = db.relationship('Compra', back_populates='produto', lazy=True)
 
     def __repr__(self):
         return f'<Produto {self.nome}>'
@@ -47,6 +47,9 @@ class Compra(db.Model):
     validade = db.Column(db.Date, nullable=True)
     quantidade = db.Column(db.Integer, nullable=False)
     preco_unitario = db.Column(db.Float, nullable=False) # Quando compra, tem o preço unidade ou total?
+
+    produto = db.relationship('FornecedorProdutos', back_populates='compras')
+
 
     def __repr__(self):
         return f'<Compra {self.produto.nome} - {self.quantidade} un>'

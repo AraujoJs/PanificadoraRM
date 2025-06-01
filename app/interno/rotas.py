@@ -546,26 +546,193 @@ def fornecedores():
     }
     return render_template('interno.html', **context)
 
+def ordenar_compras(compras, sort, order):
+    reverse = order == 'desc'
+    try:
+        if sort == 'preco_total':
+            return sorted(compras, key=lambda c: c.preco_total, reverse=reverse)
+        elif sort == 'id':
+            return sorted(compras, key=lambda c: c.id, reverse=reverse)
+        return sorted(compras, key=lambda c: getattr(c, sort), reverse=reverse)
+    except AttributeError:
+        return compras
 
 @interno.route('/relatorio')
 def relatorio():
+    anos = request.args.get('ano')
+    meses = request.args.get('mes')
+
+    today = request.args.get('today')
+
+    if today:
+        anos = get_anos_disponiveis(compras=None)
+        meses = get_meses_disponiveis(anos)[-1][0]
+
     compras = get_todas_compras()
+    total = get_total_compras(compras)
+    anos_disponiveis = get_anos_disponiveis(compras)
+    meses_disponiveis = get_meses_disponiveis('all')
+
+    ano_mes = get_atual_ano_mes(compras)
+
+    if not anos:
+        anos = 'all'
+    if not meses:
+        meses = None
+
+    if anos == 'all':
+        ano_selected = 'all'
+        meses_disponiveis = get_meses_disponiveis('all')
+    else:
+        ano_selected = int(anos)
+        meses_disponiveis = get_meses_disponiveis(anos)
+        compras = get_compras_ano(ano_selected)
+
+    if meses == 'all':
+        mes_selected = 'all'
+    else:
+        if meses:
+            mes_selected = int(meses)
+            compras = get_compras_mes(anos, meses)
+
+    if anos == 'all' or meses == 'all':
+        sort = request.args.get('sort', 'id')
+        order = request.args.get('order', 'asc')
+        meses_disponiveis = get_meses_disponiveis('all')
+
+        sort = request.args.get('sort', 'id')
+        order = request.args.get('order', 'asc')
+        reverse = order == 'desc'
+        if sort == 'produto':
+            compras.sort(key=lambda c: c.produto.nome.lower() if c.produto else '', reverse=reverse)
+        elif sort == 'data':
+            compras.sort(key=lambda c: c.data_compra, reverse=reverse)
+        elif sort == 'validade':
+            compras.sort(key=lambda c: c.validade or datetime.max.date(), reverse=reverse)
+        elif sort == 'quantidade':
+            compras.sort(key=lambda c: c.quantidade, reverse=reverse)
+        elif sort == 'preco_total':
+            compras.sort(key=lambda c: c.preco_total, reverse=reverse)
+        else:
+            compras.sort(key=lambda c: c.id, reverse=reverse)
+
+        total = get_total_compras(compras)
+        if anos == 'all':
+            ano_selected = 'all'
+        else:
+            ano_selected = int(anos)
+
+        fornecedores = get_todos_fornecedores()
+        produtos = get_todos_produtos()
+
+        context = {
+            "compras": compras,
+            "total": total,
+            "anos": anos_disponiveis,
+            "meses": meses_disponiveis,
+            "sort": sort,
+            "order": order,
+            "ano_selected": ano_selected,
+            "mes_selected": meses,
+            "fornecedores": fornecedores,
+            "produtos": produtos
+        }
+        return render_template('relatorios_interno.html', **context)
+
+    if anos and anos != 'all':
+        compras = [c for c in compras if c.data_compra.year == int(anos)]
+    if meses and meses != 'all':
+        compras = [c for c in compras if c.data_compra.month == int(meses)]
     total = get_total_compras(compras)
     anos = get_anos_disponiveis(compras)
 
-    ano_mes = get_atual_ano_mes(compras)
-    ano_atual = ano_mes['anos']
-    mes_atual = ano_mes['mes']
-    meses = get_meses_disponiveis(ano_atual)
+    sort = request.args.get('sort', 'id')
+    order = request.args.get('order', 'asc')
+    reverse = order == 'desc'
+    if sort == 'produto':
+        compras.sort(key=lambda c: c.produto.nome.lower() if c.produto else '', reverse=reverse)
+    elif sort == 'data':
+        compras.sort(key=lambda c: c.data_compra, reverse=reverse)
+    elif sort == 'validade':
+        compras.sort(key=lambda c: c.validade or datetime.max.date(), reverse=reverse)
+    elif sort == 'quantidade':
+        compras.sort(key=lambda c: c.quantidade, reverse=reverse)
+    elif sort == 'preco_total':
+        compras.sort(key=lambda c: c.preco_total, reverse=reverse)
+    else:
+        compras.sort(key=lambda c: c.id, reverse=reverse)
+
+    fornecedores = get_todos_fornecedores()
+    produtos = get_todos_produtos()
+
+    context = {
+        "compras": compras,
+        "total": total,
+        "anos": anos_disponiveis,
+        "meses": meses_disponiveis,
+        "sort": sort,
+        "order": order,
+        "ano_selected": ano_selected,
+        "mes_selected": mes_selected,
+        "fornecedores": fornecedores,
+        "produtos": produtos
+    }
+
+    return render_template('relatorios_interno.html', **context)
+
+
+@interno.route('/relatorio/<ano>')
+def relatorio_ano(ano):
+    compras = get_compras_ano(int(ano))
+    total = get_total_compras(compras)
+
+    anos = get_anos_disponiveis(get_todas_compras())
+    meses = get_meses_disponiveis(ano)
+
+    fornecedores = get_todos_fornecedores()
+    produtos = get_todos_produtos()
+
     context = {
         "compras": compras,
         "total": total,
         "anos": anos,
         "meses": meses,
-        "ano_selected": ano_atual,
-        "mes_selected": mes_atual
+        "ano_selected": int(ano),
+        "mes_selected": 'all',
+        "fornecedores": fornecedores,
+        "produtos": produtos
     }
     return render_template('relatorios_interno.html', **context)
+
+@interno.route('/relatorio/<ano>/<mes>')
+def relatorio_ano_mes(ano, mes):
+    if mes == 'all' or ano == 'all':
+        return redirect(url_for('interno.relatorio', ano='all', mes='all'))
+
+    elif ano and mes:
+        compras = get_compras_mes(int(ano), int(mes))
+        total = get_total_compras(compras)
+        anos = get_anos_disponiveis(get_todas_compras())
+
+        fornecedores = get_todos_fornecedores()
+        produtos = get_todos_produtos()
+
+        meses = get_meses_disponiveis(ano)
+        context = {
+            "compras": compras,
+            "total": total,
+            "anos": anos,
+            "meses": meses,
+            "ano_selected": int(ano),
+            "mes_selected": int(mes),
+            "fornecedores": fornecedores,
+            "produtos": produtos
+        }
+        return render_template('relatorios_interno.html', **context)
+
+    else:
+        return redirect(url_for('interno.relatorio'))
+
 
 
 def get_total_compras(compras):

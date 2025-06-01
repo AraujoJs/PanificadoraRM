@@ -20,7 +20,7 @@
     <a href="{{ url_for('interno.compras') }}">Compras</a>
     <a href="{{ url_for('interno.produtos') }}">Produtos</a>
     <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
-    <a href="{{ url_for('interno.relatorio') }}">Relatorios</a>
+    <a href="{{ url_for('interno.relatorio', today=True) }}">Relatorios</a>
  <a class="link-logout" onclick="logout()">sair</a>
 </nav>
 

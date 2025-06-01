@@ -42,14 +42,17 @@ def get_todas_compras():
 def get_todas_categorias():
     return CATEGORIAS
 
+
 def get_categoria(id):
     for c in CATEGORIAS:
         if c['id'] == int(id):
             return c
     return "Outro"
 
+
 def get_tipos_produtos():
     return TIPOS
+
 
 def get_tipo_produto(tipo_id):
     for t in TIPOS:
@@ -57,11 +60,13 @@ def get_tipo_produto(tipo_id):
             return t
     return 'Outro'
 
+
 def get_tipo_id(tipo_nome):
     for t in TIPOS:
         if t['nome'] == tipo_nome:
             return t
     return 'Outro'
+
 
 def get_todos_fornecedores():
     return Fornecedor.query.all()
@@ -132,6 +137,7 @@ def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, pr
             return False
     return False
 
+
 def update_produto(produto_id, fornecedor_id, nome, tipo_id):
     produto: FornecedorProdutos = get_produto(produto_id)
     if produto:
@@ -150,11 +156,14 @@ def update_produto(produto_id, fornecedor_id, nome, tipo_id):
     else:
         flash("Produto não encontrado.")
         return False
+
+
 def calcular_total(compras):
     total = 0.0
     for c in compras:
         total += c.preco_total
     return total
+
 
 def update_fornecedor(fornecedor_id, nome, contato, categoria):
     fornecedor: Fornecedor = get_fornecedor(fornecedor_id)
@@ -172,10 +181,12 @@ def update_fornecedor(fornecedor_id, nome, contato, categoria):
     flash("Fornecedor não encontrado.")
     return False
 
+
 def get_atual_ano_mes(compras):
     anos = get_anos_disponiveis(compras)
-    meses = get_meses_disponiveis(anos[-1])
-    return {"anos":anos[-1], "mes": meses[-1][1]}
+    meses = get_meses_disponiveis(anos[0])
+    return {"anos": anos[0], "mes": meses[-1][0]}
+
 
 def ano_valido(ano):
     if ano == "all":
@@ -194,7 +205,9 @@ def mes_valido(ano, mes):
     return False
 
 
-def get_anos_disponiveis(compras):
+def get_anos_disponiveis(compras=None):
+    if not compras:
+        return datetime.today().year
     anos = [datetime.today().year]
     for c in compras:
         ano = c.data_compra.year
@@ -204,7 +217,9 @@ def get_anos_disponiveis(compras):
 
 
 def get_meses_disponiveis(ano):
-    if int(ano) == datetime.today().year:
+    if ano == 'all':
+        return meses_ate(12)
+    elif int(ano) == datetime.today().year:
         return meses_ate(datetime.today().month)
     elif int(ano) < datetime.today().year:
         return meses_ate(12)
@@ -252,6 +267,7 @@ def adicionar_compra(produto_id, data_compra, data_vencimento, quantidade, preco
         flash(f"Erro ao adicionar no banco de dados: {str(e)}")
     return False
 
+
 def adicionar_produto(fornecedor, nome, tipo):
     produto = FornecedorProdutos(fornecedor_id=fornecedor.id, nome=nome, tipo=tipo['nome'])
     print(produto)
@@ -263,6 +279,7 @@ def adicionar_produto(fornecedor, nome, tipo):
     except Exception as e:
         flash(f"Erro ao adicionar fornecedor ao banco de dados: {str(e)}")
         return None
+
 
 def desativar_produto(produto_id):
     produto = get_produto(produto_id)
@@ -278,6 +295,7 @@ def desativar_produto(produto_id):
     flash(f"produto_id invalido! Produto não encontrado.")
     return False
 
+
 def desativar_fornecedor(fornecedor_id):
     fornecedor = get_fornecedor(fornecedor_id)
     if fornecedor:
@@ -291,6 +309,7 @@ def desativar_fornecedor(fornecedor_id):
             return False
     flash(f"fornecedor_id invalido! Fornecedor não encontrado.")
     return False
+
 
 def adicionar_fornecedor(nome, contato, categoria):
     categoria = get_categoria(int(categoria))
