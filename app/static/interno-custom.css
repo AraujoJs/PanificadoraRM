@@ -1,11 +1,34 @@
 body {
     max-width: 1000px;
+
+}
+
+.button-relatorio {
+    width: 25%;
+    padding: 12px;
+    background-color: #AF650C;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.button-relatorio-container {
+    text-align: end;
 }
 
 a {
     text-decoration: none;
+    color: #AF650C;
 }
-
+th>a {
+    text-decoration: none;
+}
 .dot {
     height: 15px;
     width: 15px;

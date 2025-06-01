@@ -1,5 +1,5 @@
 nav {
-    background-color: #88b8eb;
+    background-color: #ED8B15;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
@@ -7,6 +7,16 @@ nav {
     flex-wrap: wrap;
     border-radius: 8px;
     margin-bottom: 20px;
+}
+
+h1, h2 {
+    color: #AF650C;
+}
+
+a {
+    color: #ED8B15;
+    text-decoration: none;
+
 }
 
 nav a {
@@ -23,5 +33,5 @@ nav a:hover {
 }
 
 .link-logout {
-    color: #5e7afa;
+    color: #AF650C;
 }

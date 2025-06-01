@@ -39,12 +39,12 @@
                 <td>{{ i.tipo }}</td>
                 <td>{{ i.fornecedor }}</td>
                 <td style="text-align: right">
-                    <a href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
+                    <a class="space-end-icon" href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
                        onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
-                        Excluir
+                        <i class="fa-solid fa-trash"></i>
                     </a>
-                    <a href="{{ url_for('interno.produto_update', produto_id=i.id) }}">
-                        | Editar
+                    <a class="space-end-icon" href="{{ url_for('interno.produto_update', produto_id=i.id) }}">
+                        <i class="fa-solid fa-pen-to-square"></i>
                     </a>
                 </td>
             </tr>

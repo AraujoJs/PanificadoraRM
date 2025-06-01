@@ -139,7 +139,9 @@
 
     </table>
     </body>
-    <button onclick="window.print()">Gerar relatório</button>
+    <div class="button-relatorio-container">
+        <button class="button-relatorio" onclick="window.print()">Gerar relatório</button>
+    </div>
 
     <script src="{{ url_for('static', filename='js/relatorio.js') }}"></script>
 
