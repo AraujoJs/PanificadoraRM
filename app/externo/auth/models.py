@@ -24,4 +24,5 @@ class User(db.Model):
     sale_items = db.relationship('SaleItem', backref='user', lazy=True)
 
     def check_password(self, user_password):
+        print(f"User_password: {user_password} et self.password: {self.password}")
         return user_password == self.password
