@@ -27,11 +27,13 @@ def login():
 
 def get_token(user):
     token = jwt.encode({
-        'user_id': str(user.user_id),
+        'user_id': str(user.user_id),  # <- já faz isso no token, ok!
         'role': user.role,
         'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
     }, SECRET_KEY, algorithm='HS256')
-    session['user_id'] = user.user_id
+
+    # ⚠️ Aqui está o erro: UUID precisa virar string!
+    session['user_id'] = str(user.user_id)
     session['role'] = user.role
     return token
 
