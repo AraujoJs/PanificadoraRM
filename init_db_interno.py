@@ -6,6 +6,8 @@ Création: jojo, le 11/04/2025
 # Imports
 import logging
 
+from werkzeug.security import generate_password_hash
+
 from app import create_app
 
 # Configurations globales
@@ -27,7 +29,7 @@ def main():
             user_id=uuid.UUID("768e0770-37d7-4485-8ef0-724a593db3d3"),
             name="João",
             email="joao@gmail.com",
-            password="12345678",
+            password=generate_password_hash("12345678"),
             role="admin"
         )
         #     u2 = User(
