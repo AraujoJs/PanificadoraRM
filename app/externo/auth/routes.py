@@ -53,7 +53,9 @@ def send_login():
         password = data.get('password')
         user = User.query.filter_by(email=email).first()
         print('Email:', email, 'Password:', password, type(password))
-
+        print("Testando senha")
+        print(user.check_password(password))
+        print("Senha testada")
         if user and user.check_password(password):
             token = get_token(user)
             return jsonify({'token': token}), 200
