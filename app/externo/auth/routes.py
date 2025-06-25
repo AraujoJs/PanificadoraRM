@@ -4,17 +4,16 @@ Script: Backend/routes
 Création: jojo, le 12/04/2025
 """
 
-
 # Imports
 import datetime
-import jwt
-import pytz
 import uuid
 
+import jwt
+import pytz
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
 
-from app.externo.auth.models import User
 from app.extensions import SECRET_KEY, db
+from app.externo.auth.models import User
 from utils.auth import token_required
 
 auth = Blueprint('auth', __name__, template_folder='templates')
@@ -25,6 +24,7 @@ usuario = Blueprint('usuario', __name__, template_folder='templates')
 def login():
     return render_template('login.html')
 
+
 def get_token(user):
     token = jwt.encode({
         'user_id': str(user.user_id),
@@ -34,6 +34,7 @@ def get_token(user):
     session['user_id'] = user.user_id
     session['role'] = user.role
     return token
+
 
 @auth.route('/entrar', methods=['POST'])
 def send_login():
