@@ -5,7 +5,6 @@ Création: jojo, le 07/05/2025
 """
 
 from datetime import date
-from email.policy import default
 
 from app import db
 
@@ -15,10 +14,11 @@ class Fornecedor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     contato = db.Column(db.String(100))
-    categoria = db.Column(db.String(50)) # Ex: bebidas, embalagens, ingredientes
+    categoria = db.Column(db.String(50))  # Ex: bebidas, embalagens, ingredientes
     ativo = db.Column(db.Boolean, default=True)
 
     produtos = db.relationship('FornecedorProdutos', backref='fornecedor', lazy=True)
+
     def __repr__(self):
         return f'<Fornecedor {self.nome}>'
 
@@ -46,11 +46,10 @@ class Compra(db.Model):
     data_compra = db.Column(db.Date, default=date.today)
     validade = db.Column(db.Date, nullable=True)
     quantidade = db.Column(db.Integer, nullable=False)
-    preco_unitario = db.Column(db.Float, nullable=False) # Quando compra, tem o preço unidade ou total?
+    preco_unitario = db.Column(db.Float, nullable=False)  # Quando compra, tem o preço unidade ou total?
     consumido = db.Column(db.Boolean, default=False)
 
     produto = db.relationship('FornecedorProdutos', back_populates='compras')
-
 
     def __repr__(self):
         return f'<Compra {self.produto.nome} - {self.quantidade} un>'

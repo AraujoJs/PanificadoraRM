@@ -43,6 +43,7 @@ def send_login():
         email = data.get('email')
         password = data.get('password')
         user = User.query.filter_by(email=email).first()
+        print('Email:', email, 'Password:', password, type(password))
 
         if user and user.check_password(password):
             token = get_token(user)
