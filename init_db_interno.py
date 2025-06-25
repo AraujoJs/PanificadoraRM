@@ -21,17 +21,16 @@ import uuid
 # Programme principal
 def main():
     app = create_app()
-    # with app.app_context():
-    #     db.drop_all()
-    #     db.create_all()
-    #
-    #     u1 = User(
-    #         user_id=uuid.UUID("768e0770-37d7-4485-8ef0-724a593db3d3"),
-    #         name="João",
-    #         email="joao@gmail.com",
-    #         password="12345678",
-    #         role="admin"
-    #     )
+    with app.app_context():
+        db.create_all()
+
+        u1 = User(
+            user_id=uuid.UUID("768e0770-37d7-4485-8ef0-724a593db3d3"),
+            name="João",
+            email="joao@gmail.com",
+            password="12345678",
+            role="admin"
+        )
     #     u2 = User(
     #         user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72987e32"),
     #         name="Maria",
@@ -46,8 +45,8 @@ def main():
     #         password="11111111",
     #         role="user")
     #
-    #     db.session.add_all([u1, u2, u3])
-    #     db.session.commit()
+        db.session.add(u1)
+        db.session.commit()
     #
     #     print("Usuarios adicionados!")
     #
