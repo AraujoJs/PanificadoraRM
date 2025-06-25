@@ -3,12 +3,10 @@
 Script: PanificadoraRM/init_db
 Création: jojo, le 11/04/2025
 """
-import datetime
 # Imports
 import logging
 
 from app import create_app
-from app.interno.models import Fornecedor, FornecedorProdutos, Compra
 
 # Configurations globales
 logging.getLogger().setLevel(logging.DEBUG)
@@ -31,20 +29,20 @@ def main():
             password="12345678",
             role="admin"
         )
-    #     u2 = User(
-    #         user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72987e32"),
-    #         name="Maria",
-    #         email="maria@gmail.com",
-    #         password="87654321",
-    #         role="user")
-    #
-    #     u3 = User(
-    #         user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72983e55"),
-    #         name="Toto",
-    #         email="toto@gmail.com",
-    #         password="11111111",
-    #         role="user")
-    #
+        #     u2 = User(
+        #         user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72987e32"),
+        #         name="Maria",
+        #         email="maria@gmail.com",
+        #         password="87654321",
+        #         role="user")
+        #
+        #     u3 = User(
+        #         user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72983e55"),
+        #         name="Toto",
+        #         email="toto@gmail.com",
+        #         password="11111111",
+        #         role="user")
+        #
         db.session.add(u1)
         db.session.commit()
     #

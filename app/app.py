@@ -1,6 +1,6 @@
 from flask import url_for, redirect, Flask
 
-from app import create_app, config
+from app import create_app
 
 # Cria e roda a aplicação Flask
 app: Flask = create_app()

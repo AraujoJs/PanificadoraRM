@@ -5,7 +5,6 @@ Création: jojo, le 07/05/2025
 """
 # Imports
 import locale
-from crypt import methods
 
 from app.interno.services import *
 
@@ -73,6 +72,7 @@ def compras():
 def compras_consumir(compra_id):
     consumir_compra(compra_id)
     return redirect(url_for('interno.relatorio'))
+
 
 @interno.route('/compras/add', methods=["GET", "POST"])
 def compras_add():
@@ -355,7 +355,6 @@ def add_produto():
     return redirect(url_for('interno.produtos'))
 
 
-
 @interno.route('/compras/fornecedor/add', methods=['GET'])
 def add_fornecedor_view():
     endpoint = request.args.get('end_point')
@@ -392,7 +391,6 @@ def add_fornecedor():
 
     flash("Falha ao adicionar fornecedor!")
     return redirect(url_for('interno.fornecedores'))
-
 
 
 @interno.route('/compras/periodo/<ano>')
@@ -535,7 +533,6 @@ def fornecedores():
         "ordem": ordem
     }
     return render_template('interno.html', **context)
-
 
 
 @interno.route('/relatorio')
@@ -725,6 +722,7 @@ def compras_por_vencimento(compras):
         compras,
         key=lambda c: (c.dias_para_vencimento if c.dias_para_vencimento is not None else float('inf'))
     )
+
 
 def get_url_para(is_redirected, id):
     """Compra, produto"""

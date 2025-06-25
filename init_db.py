@@ -101,7 +101,6 @@ def main():
             db.session.commit()
             print("Itens da venda 1 adicionados!")
 
-
             sale_id2 = uuid.uuid4()
             s2 = Sale(sale_id=sale_id2, total=0.0, user_id=user.user_id)
 
@@ -171,7 +170,6 @@ def main():
             db.session.add_all([i1, i2])
             db.session.commit()
             print("Itens da venda 1 adicionados!")
-
 
             sale_id2 = uuid.uuid4()
             s2 = Sale(sale_id=sale_id2, total=0.0, user_id=user.user_id)
