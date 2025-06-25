@@ -47,6 +47,7 @@ class Compra(db.Model):
     validade = db.Column(db.Date, nullable=True)
     quantidade = db.Column(db.Integer, nullable=False)
     preco_unitario = db.Column(db.Float, nullable=False) # Quando compra, tem o preço unidade ou total?
+    consumido = db.Column(db.Boolean, default=False)
 
     produto = db.relationship('FornecedorProdutos', back_populates='compras')
 
@@ -57,3 +58,21 @@ class Compra(db.Model):
     @property
     def preco_total(self):
         return self.quantidade * self.preco_unitario
+
+    @property
+    def validade_em_texto(self):
+        if self.validade:
+            dias = (self.validade - date.today()).days
+            if dias > 0:
+                return f"Faltam {dias} dias"
+            elif dias == 0:
+                return "Vence hoje"
+            else:
+                return f"Vencido há {-dias} dias"
+        return "Sem validade"
+
+    @property
+    def dias_para_vencimento(self):
+        if self.validade:
+            return (self.validade - date.today()).days
+        return None

@@ -21,6 +21,13 @@ body {
 .button-relatorio-container {
     text-align: end;
 }
+.ml-10 {
+   margin-left: 10px;
+}
+
+.p-0 {
+    padding: 0px;
+}
 
 a {
     text-decoration: none;

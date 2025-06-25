@@ -7,7 +7,7 @@ import calendar
 import logging
 from datetime import datetime
 
-from flask import flash
+from flask import flash, redirect
 from sqlalchemy import extract
 
 from app import db
@@ -72,6 +72,8 @@ def get_todos_fornecedores():
     return Fornecedor.query.all()
 
 
+
+
 def get_todos_produtos():
     return FornecedorProdutos.query.all()
 
@@ -111,6 +113,19 @@ def get_compras_mes(ano, mes):
         extract('year', Compra.data_compra) == int(ano),
         extract('month', Compra.data_compra) == int(mes)
     ).all()
+
+def get_compras_vencimento(compras):
+    vencimentos = []
+    for c in compras:
+        validade_dias = 'data de hoje' - c.validade
+        vencimentos.append({
+            'data_compra': c.data_compra,
+            'validade': validade_dias,
+            'id': c.id,
+            'quantidade': c.quantidade,
+            'preco_total': c.preco_total
+        })
+    return vencimentos
 
 
 def update_compra(compra_id, produto_id, data_compra, vencimento, quantidade, preco_total):
@@ -245,6 +260,29 @@ def delete_compra(compra_id):
         flash("Compra não encontrada.")
         return False
 
+def ordenar_compras(compras, sort, order):
+    reverse = order == 'desc'
+    try:
+        if sort == 'preco_total':
+            return sorted(compras, key=lambda c: c.preco_total, reverse=reverse)
+        elif sort == 'id':
+            return sorted(compras, key=lambda c: c.id, reverse=reverse)
+        return sorted(compras, key=lambda c: getattr(c, sort), reverse=reverse)
+    except AttributeError:
+        return compras
+
+def consumir_compra(compra_id):
+    compra = get_compra(compra_id)
+    try:
+        compra.consumido = True
+        db.session.commit()
+        flash('Produto consumido com sucesso!', 'success')
+        return True
+
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao consumir produto!', 'error')
+        return False
 
 def adicionar_compra(produto_id, data_compra, data_vencimento, quantidade, preco_total):
     data_compra_formated = datetime.strptime(data_compra, '%Y-%m-%d').date()
@@ -322,3 +360,11 @@ def adicionar_fornecedor(nome, contato, categoria):
         db.session.rollback()
         flash(f"Erro ao inserir o fornecedor {fornecedor.id} no db: {str(e)}")
         return None
+
+def get_total_compras(compras):
+    total = 0.0
+    for c in compras:
+        total += c.preco_total
+    return total
+
+

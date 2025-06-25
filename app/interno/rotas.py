@@ -5,6 +5,7 @@ Création: jojo, le 07/05/2025
 """
 # Imports
 import locale
+from crypt import methods
 
 from app.interno.services import *
 
@@ -31,7 +32,6 @@ def compras():
 
     if filtro == "fornecedor" and fornecedor_id:
         compras = [c for c in compras_por_fornecedor(str(fornecedor_id))]
-
 
     reverse = order == "desc"
     if sort == "id":
@@ -68,6 +68,11 @@ def compras():
         context["mes_selected"] = None
     return render_template("interno.html", **context)
 
+
+@interno.route('/compras/consumir/<int:compra_id>', methods=['POST'])
+def compras_consumir(compra_id):
+    consumir_compra(compra_id)
+    return redirect(url_for('interno.relatorio'))
 
 @interno.route('/compras/add', methods=["GET", "POST"])
 def compras_add():
@@ -349,9 +354,6 @@ def add_produto():
     flash("Falha ao adicionar produto!")
     return redirect(url_for('interno.produtos'))
 
-    is_redirected = request.form['from']
-    if is_redirected == 'None':
-        is_redirected = None
 
 
 @interno.route('/compras/fornecedor/add', methods=['GET'])
@@ -392,17 +394,6 @@ def add_fornecedor():
     return redirect(url_for('interno.fornecedores'))
 
 
-def get_url_para(is_redirected, id):
-    """Compra, produto"""
-    if is_redirected == 'compras':
-        return url_for('interno.compras_add', id=id, de="produtos")
-    elif is_redirected == 'produtos':
-        return url_for('interno.add_produto_view', id=id, de="fornecedor")
-    elif is_redirected == 'fornecedor':
-        return url_for('interno.compras_add', id=id, de="produtos")
-    else:
-        return url_for('interno.compras')
-
 
 @interno.route('/compras/periodo/<ano>')
 def compras_periodo_ano(ano):
@@ -434,9 +425,9 @@ def compras_periodo_ano(ano):
         "anos": get_anos_disponiveis(compras),
         "ano_selected": int(ano),
         "meses": get_meses_disponiveis(ano),
-        "filtro": "periodo",            # filtro ativo
-        "filtro_id": int(ano),          # identificador para o filtro (ano)
-        "fornecedor_selected": None,    # garantir consistência no contexto
+        "filtro": "periodo",  # filtro ativo
+        "filtro_id": int(ano),  # identificador para o filtro (ano)
+        "fornecedor_selected": None,  # garantir consistência no contexto
         "produto_selected": None,
         "sort": request.args.get('sort', 'id'),
         "order": request.args.get('order', 'asc')
@@ -473,7 +464,6 @@ def compras_periodo_mes(ano, mes):
         compras.sort(key=lambda x: x.quantidade, reverse=reverse)
     elif sort == "preco_total":
         compras.sort(key=lambda x: x.preco_total, reverse=reverse)
-
 
     context = {
         "tela": "compras",
@@ -546,16 +536,7 @@ def fornecedores():
     }
     return render_template('interno.html', **context)
 
-def ordenar_compras(compras, sort, order):
-    reverse = order == 'desc'
-    try:
-        if sort == 'preco_total':
-            return sorted(compras, key=lambda c: c.preco_total, reverse=reverse)
-        elif sort == 'id':
-            return sorted(compras, key=lambda c: c.id, reverse=reverse)
-        return sorted(compras, key=lambda c: getattr(c, sort), reverse=reverse)
-    except AttributeError:
-        return compras
+
 
 @interno.route('/relatorio')
 def relatorio():
@@ -627,6 +608,7 @@ def relatorio():
 
         context = {
             "compras": compras,
+            "compras_vencimento": compras_por_vencimento(compras),
             "total": total,
             "anos": anos_disponiveis,
             "meses": meses_disponiveis,
@@ -667,6 +649,7 @@ def relatorio():
 
     context = {
         "compras": compras,
+        "compras_vencimento": compras_por_vencimento(compras),
         "total": total,
         "anos": anos_disponiveis,
         "meses": meses_disponiveis,
@@ -694,6 +677,7 @@ def relatorio_ano(ano):
 
     context = {
         "compras": compras,
+        "compras_vencimento": compras_por_vencimento(compras),
         "total": total,
         "anos": anos,
         "meses": meses,
@@ -703,6 +687,7 @@ def relatorio_ano(ano):
         "produtos": produtos
     }
     return render_template('relatorios_interno.html', **context)
+
 
 @interno.route('/relatorio/<ano>/<mes>')
 def relatorio_ano_mes(ano, mes):
@@ -720,6 +705,7 @@ def relatorio_ano_mes(ano, mes):
         meses = get_meses_disponiveis(ano)
         context = {
             "compras": compras,
+            "compras_vencimento": compras_por_vencimento(compras),
             "total": total,
             "anos": anos,
             "meses": meses,
@@ -734,10 +720,19 @@ def relatorio_ano_mes(ano, mes):
         return redirect(url_for('interno.relatorio'))
 
 
+def compras_por_vencimento(compras):
+    return sorted(
+        compras,
+        key=lambda c: (c.dias_para_vencimento if c.dias_para_vencimento is not None else float('inf'))
+    )
 
-def get_total_compras(compras):
-    total = 0.0
-    for c in compras:
-        total += c.preco_total
-    return total
-
+def get_url_para(is_redirected, id):
+    """Compra, produto"""
+    if is_redirected == 'compras':
+        return url_for('interno.compras_add', id=id, de="produtos")
+    elif is_redirected == 'produtos':
+        return url_for('interno.add_produto_view', id=id, de="fornecedor")
+    elif is_redirected == 'fornecedor':
+        return url_for('interno.compras_add', id=id, de="produtos")
+    else:
+        return url_for('interno.compras')
