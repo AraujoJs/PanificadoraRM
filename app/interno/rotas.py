@@ -8,7 +8,6 @@ import locale
 
 from app.interno.services import *
 
-locale.setlocale(locale.LC_TIME, 'en_GB.UTF-8')  # inglês Reino Unido
 
 from flask import Blueprint, redirect, url_for, render_template, request
 
