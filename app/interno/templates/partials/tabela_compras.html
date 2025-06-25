@@ -1,62 +1,66 @@
 <h2>Todas as compras</h2>
-<table>
-    <thead>
-    <tr>
-        <th>
-            <a href="{{ url_for('interno.compras', sort='id', order='asc' if sort != 'id' or order == 'desc' else 'desc') }}">
-                Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
 
-        <th>
-            <a href="{{ base_url }}?sort=produto&order={{ 'asc' if sort != 'produto' or order == 'desc' else 'desc' }}">
-                Produto {% if sort == 'produto' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-        <th>
-            <a href="{{ url_for('interno.compras', sort='data', order='asc' if sort != 'data' or order == 'desc' else 'desc') }}">
-                Data {% if sort == 'data' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-        <th>
-            <a href="{{ url_for('interno.compras', sort='validade', order='asc' if sort != 'validade' or order == 'desc' else 'desc') }}">
-                Validade {% if sort == 'validade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-        <th>
-            <a href="{{ url_for('interno.compras', sort='quantidade', order='asc' if sort != 'quantidade' or order == 'desc' else 'desc') }}">
-                Quantidade {% if sort == 'quantidade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}</a>
-        </th>
-        <th>
-            <a href="{{ url_for('interno.compras', sort='preco_total', order='asc' if sort != 'preco_total' or order == 'desc' else 'desc') }}">
-                Preço total {% if sort == 'preco_total' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a></th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for i in itens %}
+<div class="table-responsive">
+<table>
+
+        <thead>
         <tr>
-            <td>{{ i.id }}</td>
-            <td>{{ i.produto.nome }}</td>
-            <td>{{ i.data_compra.strftime('%d/%m/%Y') }}</td>
-            <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
-            <td>{{ i.quantidade }}</td>
-            <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
-            <td style="text-align: right">
-                <a class="space-end-icon" href="{{ url_for('interno.compras_delete', compra_id=i.id) }}"
-                   onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
-                     <i class="fa-solid fa-trash"></i>
+            <th style="width: 40px">
+                <a href="{{ url_for('interno.compras', sort='id', order='asc' if sort != 'id' or order == 'desc' else 'desc') }}">
+                    Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
                 </a>
-                <a class="space-end-icon" href="{{ url_for('interno.compras_update', compra_id=i.id) }}">
-                     <i class="fa-solid fa-pen-to-square"></i>
+            </th>
+
+            <th>
+                <a href="{{ base_url }}?sort=produto&order={{ 'asc' if sort != 'produto' or order == 'desc' else 'desc' }}">
+                    Produto {% if sort == 'produto' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
                 </a>
-            </td>
+            </th>
+            <th>
+                <a href="{{ url_for('interno.compras', sort='data', order='asc' if sort != 'data' or order == 'desc' else 'desc') }}">
+                    Data {% if sort == 'data' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                </a>
+            </th>
+            <th>
+                <a href="{{ url_for('interno.compras', sort='validade', order='asc' if sort != 'validade' or order == 'desc' else 'desc') }}">
+                    Validade {% if sort == 'validade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                </a>
+            </th>
+            <th>
+                <a href="{{ url_for('interno.compras', sort='quantidade', order='asc' if sort != 'quantidade' or order == 'desc' else 'desc') }}">
+                    Quantidade {% if sort == 'quantidade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}</a>
+            </th>
+            <th>
+                <a href="{{ url_for('interno.compras', sort='preco_total', order='asc' if sort != 'preco_total' or order == 'desc' else 'desc') }}">
+                    Preço total {% if sort == 'preco_total' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                </a></th>
+            <th></th>
         </tr>
-    {% endfor %}
-    <tr>
-        <td colspan="6" style="text-align: right;"><strong>Total:</strong></td>
-        <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
-    </tr>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for i in itens %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.produto.nome }}</td>
+                <td>{{ i.data_compra.strftime('%d/%m/%Y') }}</td>
+                <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
+                <td>{{ i.quantidade }}</td>
+                <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
+                <td style="text-align: right">
+                    <a class="space-end-icon" href="{{ url_for('interno.compras_delete', compra_id=i.id) }}"
+                       onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    <a class="space-end-icon" href="{{ url_for('interno.compras_update', compra_id=i.id) }}">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="6" style="text-align: right;"><strong>Total:</strong></td>
+            <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

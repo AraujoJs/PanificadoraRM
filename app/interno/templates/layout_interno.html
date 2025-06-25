@@ -17,16 +17,27 @@
     <div class="flash {{ category }}">{{ message }}</div>
 {% endfor %}
 <nav>
+  <!-- Botão ☰ -->
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <!-- Links escondidos no mobile -->
+  <div class="menu" id="menu">
     <a href="{{ url_for('interno.compras') }}">Compras</a>
     <a href="{{ url_for('interno.produtos') }}">Produtos</a>
     <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
-    <a href="{{ url_for('interno.relatorio', today=True) }}">Relatorios</a>
- <a class="link-logout" onclick="logout()">sair</a>
+    <a href="{{ url_for('interno.relatorio', today=True) }}">Relatórios</a>
+    <a class="link-logout" onclick="logout()">Sair</a>
+  </div>
 </nav>
 
 {% block main %}
 {% endblock %}
 <script>
+      function toggleMenu() {
+    document.getElementById("menu").classList.toggle("active");
+  }
+
+
     function logout() {
         const token = sessionStorage.getItem("token"); // ou localStorage
 

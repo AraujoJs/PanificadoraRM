@@ -3,6 +3,45 @@ body {
 
 }
 
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* força a rolagem em telas pequenas */
+}
+
+th, td {
+    padding: 0.5rem;
+    text-align: left;
+    white-space: nowrap; /* Evita quebra de linha */
+}
+
+/* Permitir quebra somente para a coluna "Produto" */
+th:nth-child(2), td:nth-child(2),
+th:nth-child(3), td:nth-child(3), /* Vencimento */
+th:nth-child(4), td:nth-child(4) /* Email */
+{
+    white-space: normal; /* permite quebra de linha */
+    word-break: break-word;
+    max-width: 300px; /* opcional: evita que a célula fique gigante */
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+@media (max-width: 768px) {
+    th, td {
+        font-size: 0.85rem;
+        padding: 0.4rem;
+    }
+}
+
 .button-relatorio {
     width: 25%;
     padding: 12px;
@@ -21,8 +60,9 @@ body {
 .button-relatorio-container {
     text-align: end;
 }
+
 .ml-10 {
-   margin-left: 10px;
+    margin-left: 10px;
 }
 
 .p-0 {
@@ -33,9 +73,11 @@ a {
     text-decoration: none;
     color: #AF650C;
 }
-th>a {
+
+th > a {
     text-decoration: none;
 }
+
 .dot {
     height: 15px;
     width: 15px;
@@ -43,6 +85,7 @@ th>a {
     border-radius: 50%;
     display: inline-block;
 }
+
 .space-end-icon {
     margin-right: 5px;
 }

@@ -43,7 +43,7 @@
 </div>
 
 <h2>Vencimentos próximos</h2>
-
+<div class="table-responsive">
 <table>
     <thead>
     <tr>
@@ -52,6 +52,7 @@
         <th>Vencimento (dias)</th>
         <th>Data da compra</th>
         <th>Quantidade</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -86,11 +87,12 @@
     {% endfor %}
     </tbody>
 </table>
-
+</div>
 
 
 
 <h2>Compras</h2>
+<div class="table-responsive">
 <table>
     <thead>
     <tr>
@@ -149,8 +151,10 @@
     </tr>
     </tbody>
 </table>
+</div>
 
 <h2>Fornecedores</h2>
+<div class="table-responsive">
 <table>
     <tr>
         <th>Id</th>
@@ -167,8 +171,10 @@
         </tr>
     {% endfor %}
 </table>
+</div>
 
 <h2>Produtos</h2>
+<div class="table-responsive">
 <table>
     <tr>
         <th>Id</th>
@@ -186,6 +192,8 @@
     {% endfor %}
 
 </table>
+</div>
+
 </body>
 <div class="button-relatorio-container">
     <button class="button-relatorio" onclick="window.print()">Gerar relatório</button>

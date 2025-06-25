@@ -4,11 +4,13 @@
     {% endif %}
 {%- endmacro %}
 <h2>Fornecedores cadastrados</h2>
+
+<div class="table-responsive">
 <table>
     <thead>
     <tr>
         {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
-        <th><a href="{{ url_for('interno.fornecedores', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
+        <th style="width: 40px"><a href="{{ url_for('interno.fornecedores', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
         </th>
 
         {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
@@ -49,3 +51,4 @@
     {% endfor %}
     </tbody>
 </table>
+</div>
