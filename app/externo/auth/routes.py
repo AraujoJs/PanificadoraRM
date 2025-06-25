@@ -32,9 +32,16 @@ def get_token(user):
         'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
     }, SECRET_KEY, algorithm='HS256')
 
+    print(f"""
+        'user_id': {str(user.user_id)},
+        'role': {user.role},
+        'exp': {int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())}
+    """)
     # ⚠️ Aqui está o erro: UUID precisa virar string!
+    print(f"UUID en string: {str(user.user_id)} e {str(user.role)}")
     session['user_id'] = str(user.user_id)
     session['role'] = user.role
+    print(f"token: {token}")
     return token
 
 
