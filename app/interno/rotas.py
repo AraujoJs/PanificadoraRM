@@ -89,11 +89,12 @@ def compras_add():
         }
         return render_template('compras_add.html', **context)
 
-    produto_id = request.form['produto_id']
-    data_compra = request.form['data_compra']
-    data_vencimento = request.form['data_vencimento']
-    quantidade = request.form['quantidade']
-    preco_total = request.form['preco_total']
+    produto_id = request.form.get('produto_id')
+    data_compra = request.form.get('data_compra')
+    data_vencimento = request.form.get('data_vencimento')
+    quantidade = request.form.get('quantidade')
+    preco_total = request.form.get('preco_total')
+
     context = {
         "produto_id": produto_id,
         "data_compra": data_compra,
