@@ -18,37 +18,41 @@
     }
 }
 
+/* nav em tela grande: linha normal */
 nav {
     background-color: var(--nav-bg);
     color: var(--nav-text);
     padding: 10px 20px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
     border-radius: 8px;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* ajuda na responsividade */
 }
 
+/* Cabeçalho: ☰ e logout */
 .menu-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 100%;
+    gap: 1rem;
 }
 
+/* Container do menu de navegação */
 .menu-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
+    gap: 1rem;
 }
 
+/* Menu de links */
 .menu {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
+/* Botão ☰ */
 .menu-toggle {
     display: none;
     font-size: 1.5rem;
@@ -79,9 +83,10 @@ nav a:hover {
     background-color: transparent;
 }
 
-/* Layout para o botão logout */
+/* Botão logout */
 .container-link-logout {
-    margin-left: auto;
+    display: flex;
+    align-items: center;
 }
 
 h1, h2 {
@@ -93,15 +98,14 @@ a {
     text-decoration: none;
 }
 
-/* --- Responsivo --- */
 @media (max-width: 768px) {
     nav {
         align-items: flex-start;
     }
 
     .menu-header {
-        flex-direction: row;
-        justify-content: space-between;
+        flex-direction: row; /* já está correto */
+        justify-content: space-between; /* garante botão ☰ à esquerda, logout à direita */
         align-items: center;
         width: 100%;
     }
@@ -117,10 +121,10 @@ a {
     }
 
     .container-link-logout {
-        width: 100%;
+        width: auto; /* ← ESSENCIAL: não deixar 100% aqui! */
         display: flex;
         justify-content: flex-end;
-        margin-top: 0.5rem;
+        margin-top: 0; /* removido o espaçamento extra */
     }
 
     .menu-toggle {

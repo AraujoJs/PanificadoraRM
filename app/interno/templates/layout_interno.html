@@ -17,22 +17,24 @@
     <div class="flash {{ category }}">{{ message }}</div>
 {% endfor %}
 <nav>
-  <!-- Botão ☰ -->
-  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <!-- Cabeçalho com ☰ e logout -->
+  <div class="menu-header">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-  <!-- Container principal de navegação -->
+    <div class="container-link-logout">
+      <a class="link-logout" onclick="logout()">
+        <i class="fa-sharp fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Menu de navegação -->
   <div class="menu-container">
     <div class="menu" id="menu">
       <a href="{{ url_for('interno.compras') }}">Compras</a>
       <a href="{{ url_for('interno.produtos') }}">Produtos</a>
       <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
       <a href="{{ url_for('interno.relatorio', today=True) }}">Relatórios</a>
-    </div>
-
-    <div class="container-link-logout">
-      <a class="link-logout" onclick="logout()">
-        <i class="fa-sharp fa-solid fa-right-from-bracket"></i>
-      </a>
     </div>
   </div>
 </nav>
