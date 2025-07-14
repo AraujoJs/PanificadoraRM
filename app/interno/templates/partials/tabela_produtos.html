@@ -36,9 +36,9 @@
         {% if i.ativo %}
             <tr>
                 <td>{{ i.id }}</td>
-                <td>{{ i.nome }}</td>
+                <td><strong>{{ i.nome }}</strong></td>
                 <td>{{ i.tipo }}</td>
-                <td>{{ i.fornecedor }}</td>
+                <td><em>{{ i.fornecedor }}</em></td>
                 <td style="text-align: right">
                     <a class="space-end-icon" href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
                        onclick="return confirm('Tem certeza que deseja excluir esta compra?')">

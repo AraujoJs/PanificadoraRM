@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,18 +20,26 @@
   <!-- Botão ☰ -->
   <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
-  <!-- Links escondidos no mobile -->
-  <div class="menu" id="menu">
-    <a href="{{ url_for('interno.compras') }}">Compras</a>
-    <a href="{{ url_for('interno.produtos') }}">Produtos</a>
-    <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
-    <a href="{{ url_for('interno.relatorio', today=True) }}">Relatórios</a>
-    <a class="link-logout" onclick="logout()">Sair</a>
+  <!-- Container principal de navegação -->
+  <div class="menu-container">
+    <div class="menu" id="menu">
+      <a href="{{ url_for('interno.compras') }}">Compras</a>
+      <a href="{{ url_for('interno.produtos') }}">Produtos</a>
+      <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
+      <a href="{{ url_for('interno.relatorio', today=True) }}">Relatórios</a>
+    </div>
+
+    <div class="container-link-logout">
+      <a class="link-logout" onclick="logout()">
+        <i class="fa-sharp fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
   </div>
 </nav>
 
 {% block main %}
 {% endblock %}
+<script src="https://kit.fontawesome.com/39ef9be472.js" crossorigin="anonymous"></script>
 <script>
       function toggleMenu() {
     document.getElementById("menu").classList.toggle("active");
@@ -55,6 +63,5 @@
         });
     }
 </script>
-<script src="https://kit.fontawesome.com/39ef9be472.js" crossorigin="anonymous"></script>
 </body>
 </html>

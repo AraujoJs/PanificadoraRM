@@ -1,9 +1,45 @@
-body {
-    max-width: 1000px;
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --table-header-bg: #f2f2f2;
+    --link-color: #AF650C;
+    --dot-color: #bbb;
+    --button-bg: #AF650C;
+    --button-text: #ffffff;
+    --error-color: red;
 
 }
 
+/* Modo escuro */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1e1e1e;
+        --text-color: #e0e0e0;
+        --table-header-bg: #2e2e2e;
+        --link-color: #ff9900;
+        --dot-color: #888;
+        --button-bg: #FF8800;
+        --button-text: #000000;
+        --error-color: #ff6666;
 
+        --focus: #888;
+        --background: #2e2e2e;
+        --button-base: #FF8800;
+        --button-hover: #AF650C;
+    }
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    max-width: 1000px;
+}
+
+select {
+    background-color: var(--table-header-bg);
+}
+
+/* Tabela */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -12,27 +48,29 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* força a rolagem em telas pequenas */
+    min-width: 600px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 th, td {
     padding: 0.5rem;
     text-align: left;
-    white-space: nowrap; /* Evita quebra de linha */
+    white-space: nowrap;
+    border-bottom: 1px solid #bebebe;
 }
 
-/* Permitir quebra somente para a coluna "Produto" */
+/* Permitir quebra em colunas específicas */
 th:nth-child(2), td:nth-child(2),
-th:nth-child(3), td:nth-child(3), /* Vencimento */
-th:nth-child(4), td:nth-child(4) /* Email */
-{
-    white-space: normal; /* permite quebra de linha */
+th:nth-child(3), td:nth-child(3),
+th:nth-child(4), td:nth-child(4) {
+    white-space: normal;
     word-break: break-word;
-    max-width: 300px; /* opcional: evita que a célula fique gigante */
+    max-width: 300px;
 }
 
 thead {
-    background-color: #f2f2f2;
+    background-color: var(--table-header-bg);
 }
 
 @media (max-width: 768px) {
@@ -42,25 +80,27 @@ thead {
     }
 }
 
+/* Botão */
 .button-relatorio {
     width: 25%;
     padding: 12px;
-    background-color: #AF650C;
-    color: #fff;
+    background-color: var(--button-bg);
+    color: var(--button-text);
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     margin-top: 1rem;
-    transition: background-color 0.3s;
     margin-left: auto;
     margin-right: auto;
+    transition: background-color 0.3s;
 }
 
 .button-relatorio-container {
     text-align: end;
 }
 
+/* Utilitários */
 .ml-10 {
     margin-left: 10px;
 }
@@ -71,7 +111,7 @@ thead {
 
 a {
     text-decoration: none;
-    color: #AF650C;
+    color: var(--link-color);
 }
 
 th > a {
@@ -81,7 +121,7 @@ th > a {
 .dot {
     height: 15px;
     width: 15px;
-    background-color: #bbb;
+    background-color: var(--dot-color);
     border-radius: 50%;
     display: inline-block;
 }
@@ -99,6 +139,6 @@ th > a {
 }
 
 small {
-    color: red;
+    color: var(--error-color);
     display: block;
 }

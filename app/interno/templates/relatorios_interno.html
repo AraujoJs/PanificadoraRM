@@ -47,8 +47,8 @@
         <table>
             <thead>
             <tr>
-                <th>Id (Compra)</th>
-                <th>Produto</th>
+                <th style="width: 100px">Id (Compra)</th>
+                <th style="width: 100px">Produto</th>
                 <th>Vencimento (dias)</th>
                 <th>Data da compra</th>
                 <th>Quantidade</th>
@@ -102,7 +102,7 @@
         <table>
             <thead>
             <tr>
-                <th>
+                <th style="width: 60px">
                     <a href="{{ base_url }}&sort=id&order={{ 'asc' if sort != 'id' or order == 'desc' else 'desc' }}">
                         Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
                     </a>
@@ -166,7 +166,7 @@
         <table>
             <thead>
             <tr>
-                <th>Id</th>
+                <th style="width: 60px">Id</th>
                 <th>Nome</th>
                 <th>Contato</th>
                 <th>Categoria</th>
@@ -193,7 +193,7 @@
         <table>
             <thead>
             <tr>
-                <th>Id</th>
+                <th style="width: 60px">Id</th>
                 <th>Nome</th>
                 <th>Tipo</th>
                 <th>Fornecedor</th>

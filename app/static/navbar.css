@@ -1,75 +1,133 @@
+:root {
+    --nav-bg: #ED8B15;
+    --nav-text: #ffffff;
+    --hover-bg: rgba(100, 100, 100, 0.27);
+    --heading-color: #AF650C;
+    --link-color: #ED8B15;
+    --logout-color: #AF650C;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --nav-bg: #ff9f1a;
+        --nav-text: #1a1a1a;
+        --hover-bg: rgba(255, 255, 255, 0.15);
+        --heading-color: #ffa733;
+        --link-color: #ff9f1a;
+        --logout-color: #8a4e00;
+    }
+}
+
 nav {
-    background-color: #ED8B15;
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
     padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.menu-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    width: 100%;
 }
 
 .menu {
     display: flex;
     gap: 1rem;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .menu-toggle {
     display: none;
     font-size: 1.5rem;
-    color: white;
+    color: var(--nav-text);
     background: none;
     border: none;
     cursor: pointer;
 }
 
+nav a {
+    color: var(--nav-text);
+    text-decoration: none;
+    padding: 0.5rem;
+    font-weight: bolder;
+}
+
+nav a:hover {
+    background-color: var(--hover-bg);
+    border-radius: 6px;
+}
+
+.link-logout {
+    font-weight: bold;
+    padding: 0.5rem;
+}
+
+.link-logout:hover {
+    background-color: transparent;
+}
+
+/* Layout para o botão logout */
+.container-link-logout {
+    margin-left: auto;
+}
+
+h1, h2 {
+    color: var(--heading-color);
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
 /* --- Responsivo --- */
 @media (max-width: 768px) {
-    .menu {
-        display: none; /* Oculta links */
-        flex-direction: column;
+    nav {
+        align-items: flex-start;
+    }
+
+    .menu-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
         width: 100%;
     }
 
+    .menu {
+        width: 100%;
+        flex-direction: column;
+        display: none;
+    }
+
     .menu.active {
-        display: flex; /* Mostra ao clicar */
+        display: flex;
+    }
+
+    .container-link-logout {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
     }
 
     .menu-toggle {
-        display: block; /* Mostra o botão ☰ */
-    }
-
-    nav {
-        flex-direction: column;
-        align-items: flex-start;
+        display: block;
     }
 
     nav a {
         width: 100%;
     }
-}
-
-h1, h2 {
-    color: #AF650C;
-}
-
-a {
-    color: #ED8B15;
-    text-decoration: none;
-
-}
-
-
-nav a:hover {
-    background-color: rgba(100, 100, 100, 0.27);
-}
-
-.link-logout {
-    color: #AF650C;
 }

@@ -41,10 +41,10 @@
         {% for i in itens %}
             <tr>
                 <td>{{ i.id }}</td>
-                <td>{{ i.produto.nome }}</td>
+                <td><strong>{{ i.produto.nome }}</strong></td>
                 <td>{{ i.data_compra.strftime('%d/%m/%Y') }}</td>
-                <td>{{ i.validade.strftime('%d/%m/%Y') }}</td>
-                <td>{{ i.quantidade }}</td>
+                <td><em>{{ i.validade.strftime('%d/%m/%Y') }}</em></td>
+                <td><strong>{{ i.quantidade }}</strong></td>
                 <td>{{ "%.2f" | format(i.preco_total) }} R$</td>
                 <td style="text-align: right">
                     <a class="space-end-icon" href="{{ url_for('interno.compras_delete', compra_id=i.id) }}"

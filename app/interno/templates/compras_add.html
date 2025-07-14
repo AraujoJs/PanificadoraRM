@@ -7,10 +7,10 @@
         <form method="post" action="/interno/compras/add">
             <label>Produto
                 {% if not produtos %}
-                    <br><a>Adicionar primeiro produto</a>
+                    <br>
+                    <a href="{{ url_for('interno.add_produto', end_point="compras") }}">Adicionar primeiro produto</a>
                 {% else %}
                     <select name="produto_id" id="produtos" required>
-                        <option value="">Selecionar</option>
                         {% for p in produtos %}
                             <option value="{{ p.id }}"{% if produto_selected.id == p.id %} selected{% endif %}>
                                 {{ p.nome }}
@@ -44,8 +44,12 @@
                 <span id="preco-total-visor">Total:</span>
                 <br>
 
-                <button>Adicionar</button>
+                <button {% if not produtos %}disabled{% endif %}>Adicionar</button>
                 <a href="{{ url_for('interno.compras') }}" class="btn btn-secondary">Cancelar</a>
+
+                {% if not produtos %}
+                    <small style="color: red;">Adicione um produto antes de registrar uma compra.</small>
+                {% endif %}
 
                 {% if error %}
                     <small>Erro ao adicionar compra.</small>

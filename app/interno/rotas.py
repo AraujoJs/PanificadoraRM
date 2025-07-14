@@ -578,8 +578,8 @@ def relatorio():
         ano_selected = 'all'
         meses_disponiveis = get_meses_disponiveis('all')
     else:
-        ano_selected = int(anos)
-        meses_disponiveis = get_meses_disponiveis(anos)
+        ano_selected = int(anos[0])
+        meses_disponiveis = get_meses_disponiveis(anos[0])
         compras = get_compras_ano(ano_selected)
 
     if meses == 'all':
@@ -587,7 +587,7 @@ def relatorio():
     else:
         if meses:
             mes_selected = int(meses)
-            compras = get_compras_mes(anos, meses)
+            compras = get_compras_mes(anos[0], meses)
 
     if anos == 'all' or meses == 'all':
         sort = request.args.get('sort', 'id')
@@ -635,7 +635,7 @@ def relatorio():
         return render_template('relatorios_interno.html', **context)
 
     if anos and anos != 'all':
-        compras = [c for c in compras if c.data_compra.year == int(anos)]
+        compras = [c for c in compras if c.data_compra.year == int(anos[0])]
     if meses and meses != 'all':
         compras = [c for c in compras if c.data_compra.month == int(meses)]
     total = get_total_compras(compras)

@@ -7,9 +7,12 @@
         <form method="POST" action="/interno/compras/produtos/add">
             <input type="hidden" name="endpoint" id="endpoint" value="{{ endpoint }}">
 
-            <label>Fornecedor
-                <select name="fornecedor_id" id="fornecedores" required>
-                    <option value="">Selecionar</option>
+            <label>Fornecedor</label>
+            <br>
+                {% if not fornecedores %}
+                    <a href="{{ url_for('interno.add_fornecedor', end_point='produtos')}}">Adicionar primeiro fornecedor</a>
+                {% else %}
+                    <select name="fornecedor_id" id="fornecedores" required>
                     {% for f in fornecedores %}
                         {% if f.ativo %}
                             <option value="{{ f.id }}"
@@ -19,22 +22,30 @@
                     {% endfor %}
                     <option value="add">-- Novo Fornecedor --</option>
                 </select>
+                {% endif %}
             </label>
             <br>
-            <label>Nome
-                <input type="text" name="nome" id="nome" required>
-            </label>
-            <br>
-            <label>Tipo
-                <select name="tipo_id" id="tipos" required>
-                    <option value="">Selecionar</option>
-                    {% for t in tipos %}
-                        <option value="{{ t.id }}">{{ t.nome }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <br>
-            <button type="submit">Adicionar</button>
+            <fieldset>
+                <legend>Informations sobre o produto</legend>
+                <label>Nome
+                    <input type="text" name="nome" id="nome" required>
+                </label>
+                <br>
+                <label>Tipo
+                    <select name="tipo_id" id="tipos" required>
+                        <option value="">Selecionar</option>
+                        {% for t in tipos %}
+                            <option value="{{ t.id }}">{{ t.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </fieldset>
+            <button {% if not fornecedores %}disabled{% endif %}>Adicionar</button>
+
+            <a href="{{ url_for('interno.compras') }}" class="btn btn-secondary">Cancelar</a>
+                    {% if not fornecedores %}
+                <small style="color: red;">Adicione um fornecedor antes de registrar uma produto.</small>
+            {% endif %}
         </form>
     {% elif mode == "update" %}
         <h2>Atualizar produto n° {{ produto_id }}</h2>

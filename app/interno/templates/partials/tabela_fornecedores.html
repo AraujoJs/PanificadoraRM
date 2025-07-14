@@ -37,8 +37,8 @@
                 <tr>
                     <td>{{ i.id }}</td>
                     <td>{{ i.nome }}</td>
-                    <td>{{ i.contato }}</td>
-                    <td>{{ i.categoria }}</td>
+                    <td><strong>{{ i.contato }}</strong></td>
+                    <td><em>{{ i.categoria }}</em></td>
                     <td style="text-align: right">
                         <a class="space-end-icon" href="{{ url_for('interno.fornecedor_delete', fornecedor_id=i.id) }}"
                            onclick="return confirm('Tem certeza que deseja excluir este fornecedor?')">

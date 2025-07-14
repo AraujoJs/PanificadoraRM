@@ -29,7 +29,7 @@ def get_token(user):
     token = jwt.encode({
         'user_id': str(user.user_id),  # <- já faz isso no token, ok!
         'role': user.role,
-        'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=2)).timestamp())
+        'exp': int((datetime.datetime.now(pytz.utc) + datetime.timedelta(hours=24)).timestamp())
     }, SECRET_KEY, algorithm='HS256')
 
     print(f"""
