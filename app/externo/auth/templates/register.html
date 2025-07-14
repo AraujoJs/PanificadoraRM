@@ -2,22 +2,29 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Registro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
+    <title>Panificadora-RM — Registro</title>
 </head>
 <body>
-
-<div class="login-container">
-    <h2>Criar uma conta</h2>
-    <form id="register-form">
-        <input type="text" name="name" placeholder="Nome" required>
-        <input type="email" name="email" placeholder="E-mail" required>
-        <input type="password" name="password" placeholder="Senha" required>
-        <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
-        <button class="button-send" type="submit">Cadastrar</button>
-    </form>
-    <div class="links">
-        Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
+<div>
+    <div id="login-logo-container">
+        <div>
+            <img id="login-logo" src="{{ url_for('static', filename='assets/icon/logo-prm.png') }}">
+        </div>
+    </div>
+    <div class="login-container">
+        <h2>Criar uma conta</h2>
+        <form id="register-form">
+            <input type="text" name="name" placeholder="Nome" required>
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
+            <button class="button-send" type="submit">Cadastrar</button>
+        </form>
+        <div class="links">
+            Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login</a>
+        </div>
     </div>
 </div>
 
