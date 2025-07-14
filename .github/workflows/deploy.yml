@@ -29,9 +29,3 @@ jobs:
           pip install -r requirements.txt
           sudo systemctl restart panificadorarm.service
         EOF
-~
-~
-~
-~
-~
-~
