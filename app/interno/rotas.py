@@ -544,9 +544,25 @@ def relatorio():
 
     if today:
         anos = get_anos_disponiveis(compras=None)
-        meses = get_meses_disponiveis(anos)[-1][0]
+        meses = get_meses_disponiveis(anos[0])[-1][0]
+
 
     compras = get_todas_compras()
+    if len(compras) == 0:
+        context = {
+            "compras": None,
+            "compras_vencimento": None,
+            "total": 0,
+            "anos": [anos],
+            "meses": get_meses_disponiveis(anos[0]),
+            "ano_selected": get_atual_ano_mes(compras=None)["anos"],
+            "mes_selected": get_atual_ano_mes(compras=None)["mes"],
+            "fornecedores": None,
+            "produtos": None
+        }
+
+        return render_template('relatorios_interno.html', **context)
+
     total = get_total_compras(compras)
     anos_disponiveis = get_anos_disponiveis(compras)
     meses_disponiveis = get_meses_disponiveis('all')

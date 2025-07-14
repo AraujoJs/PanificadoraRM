@@ -6,49 +6,51 @@
 <h2>Fornecedores cadastrados</h2>
 
 <div class="table-responsive">
-<table>
-    <thead>
-    <tr>
-        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
-        <th style="width: 40px"><a href="{{ url_for('interno.fornecedores', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
-        </th>
-
-        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
-        <th>
-            <a href="{{ url_for('interno.fornecedores', ordenar='nome', ordem=proxima_ordem) }}">Nome {{ flecha('nome') }}</a>
-        </th>
-
-        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'contato' else 'asc' %}
-        <th>
-            <a href="{{ url_for('interno.fornecedores', ordenar='contato', ordem=proxima_ordem) }}">Contato {{ flecha('contato') }}</a>
-        </th>
-
-        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'categoria' else 'asc' %}
-        <th>
-            <a href="{{ url_for('interno.fornecedores', ordenar='categoria', ordem=proxima_ordem) }}">Categoria {{ flecha('categoria') }}</a>
-        </th>
-
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for i in itens %}
+    <table>
+        <thead>
         <tr>
-            <td>{{ i.id }}</td>
-            <td>{{ i.nome }}</td>
-            <td>{{ i.contato }}</td>
-            <td>{{ i.categoria }}</td>
-            <td style="text-align: right">
-                <a class="space-end-icon" href="{{ url_for('interno.fornecedor_delete', fornecedor_id=i.id) }}"
-                   onclick="return confirm('Tem certeza que deseja excluir este fornecedor?')">
-                    <i class="fa-solid fa-trash"></i>
-                </a>
-                <a class="space-end-icon" href="{{ url_for('interno.fornecedor_update', fornecedor_id=i.id) }}">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                </a>
-            </td>
+            {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
+            <th style="width: 40px"><a href="{{ url_for('interno.fornecedores', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
+            </th>
+
+            {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
+            <th>
+                <a href="{{ url_for('interno.fornecedores', ordenar='nome', ordem=proxima_ordem) }}">Nome {{ flecha('nome') }}</a>
+            </th>
+
+            {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'contato' else 'asc' %}
+            <th>
+                <a href="{{ url_for('interno.fornecedores', ordenar='contato', ordem=proxima_ordem) }}">Contato {{ flecha('contato') }}</a>
+            </th>
+
+            {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'categoria' else 'asc' %}
+            <th>
+                <a href="{{ url_for('interno.fornecedores', ordenar='categoria', ordem=proxima_ordem) }}">Categoria {{ flecha('categoria') }}</a>
+            </th>
+
+            <th></th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {% for i in itens %}
+            {% if i.ativo %}
+                <tr>
+                    <td>{{ i.id }}</td>
+                    <td>{{ i.nome }}</td>
+                    <td>{{ i.contato }}</td>
+                    <td>{{ i.categoria }}</td>
+                    <td style="text-align: right">
+                        <a class="space-end-icon" href="{{ url_for('interno.fornecedor_delete', fornecedor_id=i.id) }}"
+                           onclick="return confirm('Tem certeza que deseja excluir este fornecedor?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                        <a class="space-end-icon" href="{{ url_for('interno.fornecedor_update', fornecedor_id=i.id) }}">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
 </div>

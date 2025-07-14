@@ -4,208 +4,228 @@
 {% set base_url = url_for('interno.relatorio', ano=ano_selected, mes=mes_selected) %}
 
 {% block main %}
-<style>
-    #data-container {
-        display: flex;
-    }
-</style>
-<body>
-<h1>Relatório Geral</h1>
-<div id="data-container">
-    <div id="data-ano-filter">
-        <label>Ano:</label>
-        <select name="periodo-ano" id="periodo-ano">
-            <option value="all" {% if ano_selected == "all" %}selected{% endif %}>-- Todos --</option>
-            {% for a in anos %}
-                {% if ano_selected and ano_selected == a %}
-                    <option value="{{ a }}" selected>{{ a }}</option>
-                {% else %}
-                    <option value="{{ a }}">{{ a }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-    </div>
-    <div id="data-mes-filter" {% if ano_selected == 'all' %} style="display: none"
-    {% else %} style="display: block"
-    {% endif %} >
-        <label>Mês:</label>
-        <select name="periodo-mes" id="periodo-mes">
-            <option value="all" {% if mes_selected == "all" %}selected{% endif %}>-- Todos --</option>
-            {% for mes_num, mes_nome in meses %}
-                {% if mes_selected and mes_selected == mes_num %}
-                    <option value="{{ mes_num }}" selected>{{ mes_nome }}</option>
-                {% else %}
-                    <option value="{{ mes_num }}">{{ mes_nome }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-    </div>
-</div>
-
-<h2>Vencimentos próximos</h2>
-<div class="table-responsive">
-<table>
-    <thead>
-    <tr>
-        <th>Id (Compra)</th>
-        <th>Produto</th>
-        <th>Vencimento (dias)</th>
-        <th>Data da compra</th>
-        <th>Quantidade</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for c in compras_vencimento %}
-    {% if not c.consumido %}
-        <tr>
-        <td>{{ c.id }}</td>
-        <td>{{ c.produto.nome }}</td>
-    {% if c.dias_para_vencimento == 0 %}
-        <td style="color: #be0000">{{ c.validade_em_texto }}<i class="fa-solid fa-triangle-exclamation ml-10"></i></td>
-    {% elif c.dias_para_vencimento < 0 %}
-        <td style="color: red">{{ c.validade_em_texto }}<i class="fa-solid fa-circle-exclamation ml-10"></i></td>
-    {% elif c.dias_para_vencimento < 15 %}
-        <td style="color: #d07201">{{ c.validade_em_texto }}<i class="fa-solid fa-exclamation ml-10"></i></td>
-    {% elif c.dias_para_vencimento >= 15 %}
-        <td>{{ c.validade_em_texto }}<i class="fa-solid fa-hourglass-end ml-10"></i></td>
-    {% else %}
-        <td style="color: gray">{{ c.validade_em_texto }}<i class="fa-solid fa-question"></i></td>
-    {% endif %}
-    <td>{{ c.data_compra.strftime('%d/%m/%Y')}}</td>
-        <td>{{ c.quantidade }}</td>
-            <td style="text-align: right">
-        <form method="POST" action="{{ url_for('interno.compras_consumir', compra_id=c.id) }}"
-              onsubmit="return confirm('Certeza que esse produto já foi consumido?')">
-            <button type="submit" class="btn btn-link p-0" style="border: none; background: none;">
-                <i class="fa-solid fa-fire fa-lg" style="color: #e32400;"></i>
-            </button>
-        </form>
-    </td>
-    </tr>
-    {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
-</div>
-
-
-
-<h2>Compras</h2>
-<div class="table-responsive">
-<table>
-    <thead>
-    <tr>
-        <th>
-            <a href="{{ base_url }}&sort=id&order={{ 'asc' if sort != 'id' or order == 'desc' else 'desc' }}">
-                Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-        <th>
-            <a href="{{ base_url }}&sort=produto&order={{ 'asc' if sort != 'produto' or order == 'desc' else 'desc' }}">
-                Produto {% if sort == 'produto' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-        <th>
-            <a href="{{ base_url }}&sort=data&order={{ 'asc' if sort != 'data' or order == 'desc' else 'desc' }}">
-                Data {% if sort == 'data' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-        <th>
-            <a href="{{ base_url }}&sort=validade&order={{ 'asc' if sort != 'validade' or order == 'desc' else 'desc' }}">
-                Validade {% if sort == 'validade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-        <th>
-            <a href="{{ base_url }}&sort=quantidade&order={{ 'asc' if sort != 'quantidade' or order == 'desc' else 'desc' }}">
-                Quantidade {% if sort == 'quantidade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-        <th>
-            <a href="{{ base_url }}&sort=preco_total&order={{ 'asc' if sort != 'preco_total' or order == 'desc' else 'desc' }}">
-                Preço total {% if sort == 'preco_total' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
-            </a>
-        </th>
-
-    </tr>
-    </thead>
-    <tbody>
-    {% for c in compras %}
-        <tr>
-            <td>{{ c.id }}</td>
-            <td>{{ c.produto.nome }}</td>
-            <td>{{ c.data_compra.strftime('%d/%m/%Y') }}</td>
-            <td>{{ c.validade.strftime('%d/%m/%Y') }}</td>
-            <td>{{ c.quantidade }}</td>
-            <td>{{ "%.2f" | format(c.preco_total) }} R$</td>
-        </tr>
-    {% endfor %}
-    <tr>
-        <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
-        <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
-    </tr>
-    </tbody>
-</table>
-</div>
-
-<h2>Fornecedores</h2>
-<div class="table-responsive">
-<table>
-    <tr>
-        <th>Id</th>
-        <th>Nome</th>
-        <th>Contato</th>
-        <th>Categoria</th>
-    </tr>
-    {% for f in fornecedores %}
-        <tr>
-            <td>{{ f.id }}</td>
-            <td>{{ f.nome }}</td>
-            <td>{{ f.contato }}</td>
-            <td>{{ f.categoria }}</td>
-        </tr>
-    {% endfor %}
-</table>
-</div>
-
-<h2>Produtos</h2>
-<div class="table-responsive">
-<table>
-    <tr>
-        <th>Id</th>
-        <th>Nome</th>
-        <th>Tipo</th>
-        <th>Fornecedor</th>
-    </tr>
-    {% for p in produtos %}
-        <tr>
-            <td>{{ p.id }}</td>
-            <td>{{ p.nome }}</td>
-            <td>{{ p.tipo }}</td>
-            <td>{{ p.fornecedor.nome }}</td>
-        </tr>
-    {% endfor %}
-
-</table>
-</div>
-
-</body>
-<div class="button-relatorio-container">
-    <button class="button-relatorio" onclick="window.print()">Gerar relatório</button>
-</div>
-
-<script src="{{ url_for('static', filename='js/relatorio.js') }}"></script>
-
-<style>
-    @media print {
-        button {
-            display: none;
+    <style>
+        #data-container {
+            display: flex;
         }
-    }
-</style>
+    </style>
+    <body>
+    <h1>Relatório Geral</h1>
+    <div id="data-container">
+        <div id="data-ano-filter">
+            <label>Ano:</label>
+            <select name="periodo-ano" id="periodo-ano">
+                <option value="all" {% if ano_selected == "all" %}selected{% endif %}>-- Todos --</option>
+                {% for a in anos %}
+                    {% if ano_selected and ano_selected == a %}
+                        <option value="{{ a }}" selected>{{ a }}</option>
+                    {% else %}
+                        <option value="{{ a }}">{{ a }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div id="data-mes-filter" {% if ano_selected == 'all' %} style="display: none"
+        {% else %} style="display: block"
+        {% endif %} >
+            <label>Mês:</label>
+            <select name="periodo-mes" id="periodo-mes">
+                <option value="all" {% if mes_selected == "all" %}selected{% endif %}>-- Todos --</option>
+                {% for mes_num, mes_nome in meses %}
+                    {% if mes_selected and mes_selected == mes_num %}
+                        <option value="{{ mes_num }}" selected>{{ mes_nome }}</option>
+                    {% else %}
+                        <option value="{{ mes_num }}">{{ mes_nome }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <h2>Vencimentos próximos</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+            <tr>
+                <th>Id (Compra)</th>
+                <th>Produto</th>
+                <th>Vencimento (dias)</th>
+                <th>Data da compra</th>
+                <th>Quantidade</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if compras_vencimento %}
+                {% for c in compras_vencimento %}
+                    {% if not c.consumido %}
+                        <tr>
+                            <td>{{ c.id }}</td>
+                            <td>{{ c.produto.nome }}</td>
+                            {% if c.dias_para_vencimento == 0 %}
+                                <td style="color: #be0000">{{ c.validade_em_texto }}<i
+                                        class="fa-solid fa-triangle-exclamation ml-10"></i></td>
+                            {% elif c.dias_para_vencimento < 0 %}
+                                <td style="color: red">{{ c.validade_em_texto }}<i
+                                        class="fa-solid fa-circle-exclamation ml-10"></i></td>
+                            {% elif c.dias_para_vencimento < 15 %}
+                                <td style="color: #d07201">{{ c.validade_em_texto }}<i
+                                        class="fa-solid fa-exclamation ml-10"></i></td>
+                            {% elif c.dias_para_vencimento >= 15 %}
+                                <td>{{ c.validade_em_texto }}<i class="fa-solid fa-hourglass-end ml-10"></i></td>
+                            {% else %}
+                                <td style="color: gray">{{ c.validade_em_texto }}<i class="fa-solid fa-question"></i>
+                                </td>
+                            {% endif %}
+                            <td>{{ c.data_compra.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ c.quantidade }}</td>
+                            <td style="text-align: right">
+                                <form method="POST" action="{{ url_for('interno.compras_consumir', compra_id=c.id) }}"
+                                      onsubmit="return confirm('Certeza que esse produto já foi consumido?')">
+                                    <button type="submit" class="btn btn-link p-0"
+                                            style="border: none; background: none;">
+                                        <i class="fa-solid fa-fire fa-lg" style="color: #e32400;"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <h2>Compras</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+            <tr>
+                <th>
+                    <a href="{{ base_url }}&sort=id&order={{ 'asc' if sort != 'id' or order == 'desc' else 'desc' }}">
+                        Id {% if sort == 'id' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ base_url }}&sort=produto&order={{ 'asc' if sort != 'produto' or order == 'desc' else 'desc' }}">
+                        Produto {% if sort == 'produto' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ base_url }}&sort=data&order={{ 'asc' if sort != 'data' or order == 'desc' else 'desc' }}">
+                        Data {% if sort == 'data' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ base_url }}&sort=validade&order={{ 'asc' if sort != 'validade' or order == 'desc' else 'desc' }}">
+                        Validade {% if sort == 'validade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ base_url }}&sort=quantidade&order={{ 'asc' if sort != 'quantidade' or order == 'desc' else 'desc' }}">
+                        Quantidade {% if sort == 'quantidade' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ base_url }}&sort=preco_total&order={{ 'asc' if sort != 'preco_total' or order == 'desc' else 'desc' }}">
+                        Preço total {% if sort == 'preco_total' %}{{ '↑' if order == 'asc' else '↓' }}{% endif %}
+                    </a>
+                </th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% if compras %}
+                {% for c in compras %}
+                    <tr>
+                        <td>{{ c.id }}</td>
+                        <td>{{ c.produto.nome }}</td>
+                        <td>{{ c.data_compra.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ c.validade.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ c.quantidade }}</td>
+                        <td>{{ "%.2f" | format(c.preco_total) }} R$</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            <tr>
+                <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
+                <td><strong>{{ "%.2f"|format(total) }} R$</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Fornecedores</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Categoria</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if fornecedores %}
+                {% for f in fornecedores %}
+                    <tr>
+                        <td>{{ f.id }}</td>
+                        <td>{{ f.nome }}</td>
+                        <td>{{ f.contato }}</td>
+                        <td>{{ f.categoria }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <h2>Produtos</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Fornecedor</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if produtos %}
+                {% for p in produtos %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.tipo }}</td>
+                        <td>{{ p.fornecedor.nome }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    </body>
+    <div class="button-relatorio-container">
+        <button class="button-relatorio" onclick="window.print()">Gerar relatório</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/relatorio.js') }}"></script>
+
+    <style>
+        @media print {
+            button {
+                display: none;
+            }
+        }
+    </style>
 {% endblock %}

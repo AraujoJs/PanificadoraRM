@@ -69,13 +69,13 @@ def get_tipo_id(tipo_nome):
 
 
 def get_todos_fornecedores():
-    return Fornecedor.query.all()
+    return Fornecedor.query.filter_by(ativo=True).all()
 
 
 
 
 def get_todos_produtos():
-    return FornecedorProdutos.query.all()
+    return FornecedorProdutos.query.filter_by(ativo=True).all()
 
 
 def get_compra(id):
@@ -197,7 +197,12 @@ def update_fornecedor(fornecedor_id, nome, contato, categoria):
     return False
 
 
+
 def get_atual_ano_mes(compras):
+    if not compras:
+        hoje = datetime.today()
+        return {"anos": hoje.year, "mes": hoje.month}
+
     anos = get_anos_disponiveis(compras)
     meses = get_meses_disponiveis(anos[0])
     return {"anos": anos[0], "mes": meses[-1][0]}
@@ -222,7 +227,7 @@ def mes_valido(ano, mes):
 
 def get_anos_disponiveis(compras=None):
     if not compras:
-        return datetime.today().year
+        return [datetime.today().year]
     anos = [datetime.today().year]
     for c in compras:
         ano = c.data_compra.year

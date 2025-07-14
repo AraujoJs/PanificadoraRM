@@ -11,9 +11,12 @@
                 <select name="fornecedor_id" id="fornecedores" required>
                     <option value="">Selecionar</option>
                     {% for f in fornecedores %}
-                        <option value="{{ f.id }}"
-                                {% if fornecedor_selected.id == f.id %}selected{% endif %}>{{ f.nome }}
-                        </option>                    {% endfor %}
+                        {% if f.ativo %}
+                            <option value="{{ f.id }}"
+                                    {% if fornecedor_selected.id == f.id %}selected{% endif %}>{{ f.nome }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
                     <option value="add">-- Novo Fornecedor --</option>
                 </select>
             </label>
@@ -55,7 +58,8 @@
             <label>Tipo
                 <select name="tipo_id" id="tipos" required>
                     {% for t in tipos %}
-                        <option value="{{ t.id }}" {% if tipo_selected.id == t.id %}selected{% endif %}>{{ t.nome }}</option>
+                        <option value="{{ t.id }}"
+                                {% if tipo_selected.id == t.id %}selected{% endif %}>{{ t.nome }}</option>
                     {% endfor %}
                 </select>
             </label>
