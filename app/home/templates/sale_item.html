@@ -1,41 +1,37 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}Itens Vendidos — PanificadoraRM{% endblock %}
 {% block main %}
-    <h2>Itens vendidos</h2>
-    <table style="font-size: 80%">
+<div class="page-header">
+    <h1>Itens Vendidos</h1>
+    <p class="page-subtitle">Detalhamento de todos os itens de venda</p>
+</div>
+<div class="card">
+    <h2 class="card-title">🧾 Itens de Venda</h2>
+    {% if items %}
+    <table class="table">
         <thead>
-        <tr>
-            <th>Id</th>
-            <th>Quantidade</th>
-            <th>Sub-total</th>
-            <th>Usuario</th>
-            <th>Id da Venda</th>
-            <th>Produto</th>
-        </tr>
+            <tr>
+                <th>#</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Subtotal</th>
+                <th>Vendedor</th>
+            </tr>
         </thead>
         <tbody>
-        {%- for item in items %}
+            {% for item in items %}
             <tr>
-                <td>
-                    {{ item.item_id }}
-                </td>
-                <td>
-                    {{ item.quantity }}
-                </td>
-                <td>
-                    {{ "%.2f" | format(item.subtotal) }} R$
-                </td>
-                <td>
-                    {{ item.user_name }}
-                </td>
-                <td>
-                    {{ item.sale_id }}
-                </td>
-                <td>
-                    {{ item.product_name }}
-                </td>
+                <td><code style="font-size:0.75rem;color:var(--text-muted)">{{ item.item_id }}</code></td>
+                <td><strong>{{ item.product_name }}</strong></td>
+                <td><span class="badge badge-ok">{{ item.quantity }} un.</span></td>
+                <td><strong style="color:var(--accent)">R$ {{ "%.2f" | format(item.subtotal | float) }}</strong></td>
+                <td>{{ item.user_name }}</td>
             </tr>
-        {%- endfor %}
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="empty-state"><p>Nenhum item registrado ainda.</p></div>
+    {% endif %}
+</div>
 {% endblock %}

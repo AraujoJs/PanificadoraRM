@@ -1,44 +1,58 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Démo{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
-
+    <title>{% block title %}PanificadoraRM{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
-{% for category, message in get_flashed_messages(with_categories=True) %}
-    <div class="flash {{ category }}">{{ message }}</div>
-{% endfor %}
-<nav>
-    <a href="{{ url_for('home.sales') }}">Vendas</a>
-    <a href="{{ url_for('home.products') }}">Produtos</a>
-    <a href="{{ url_for('home.sale_item') }}">Itens Vendidos</a>
-    <a href="{{ url_for('home.users') }}">Usuarios</a>
-    <a href="{{ url_for('home.relatorio') }}">Relatorios</a>
-    <a href="{{ url_for('home.rotas_index') }}">Rotas</a>
- <a class="link-logout" onclick="logout()">sair</a>
+
+<nav class="navbar">
+    <div class="navbar-brand">🍞 PanificadoraRM</div>
+    <div class="navbar-links">
+        <a href="{{ url_for('home.dashboard') }}" class="nav-link">🏠 Dashboard</a>
+        <a href="{{ url_for('home.products') }}" class="nav-link">📦 Materiais</a>
+        <a href="{{ url_for('home.stock_entries') }}" class="nav-link">📋 Compras</a>
+        <a href="{{ url_for('home.nova_entrada') }}" class="nav-link nav-link-accent">＋ Nova Compra</a>
+        <a href="{{ url_for('home.suppliers') }}" class="nav-link">🏭 Fornecedores</a>
+        <a href="{{ url_for('home.contas_a_pagar') }}" class="nav-link">💳 Contas a Pagar</a>
+        <a href="{{ url_for('home.relatorio') }}" class="nav-link">📊 Relatórios</a>
+        {% if user and user.role == 'admin' %}
+        <a href="{{ url_for('home.users') }}" class="nav-link" style="color:var(--text-muted);font-size:0.8rem">⚙️</a>
+        {% endif %}
+        <a class="nav-link nav-link-logout" onclick="logout()" href="#">Sair</a>
+    </div>
 </nav>
 
-{% block main %}
-{% endblock %}
+<div class="main-content">
+    {% for category, message in get_flashed_messages(with_categories=True) %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    {% block main %}{% endblock %}
+
+    <footer class="app-footer print-hide">
+        <p>© 2026 PanificadoraRM — v1.0</p>
+        <p>Desenvolvido por <strong>JBC Software</strong></p>
+    </footer>
+</div>
+
 <script>
     function logout() {
-        const token = sessionStorage.getItem("token"); // ou localStorage
-
+        const token = sessionStorage.getItem("token");
         fetch("/auth/sair", {
             method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        }).then(response => {
-            if (response.ok) {
-                window.location.href = "/auth/entrar";
-            } else {
-                alert("Erro ao sair.");
-            }
+            headers: { "Authorization": "Bearer " + token }
+        }).then(() => {
+            sessionStorage.removeItem("token");
+            window.location.href = "/auth/entrar";
+        }).catch(() => {
+            sessionStorage.removeItem("token");
+            window.location.href = "/auth/entrar";
         });
     }
 </script>

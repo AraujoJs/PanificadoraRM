@@ -1,33 +1,157 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}Materiais — PanificadoraRM{% endblock %}
 {% block main %}
-    <h2>Lista de produtos</h2>
-    <table style="font-size: 80%">
+
+<div class="page-header">
+    <h1>📦 Materiais / Insumos</h1>
+    <p class="page-subtitle">Cadastro de materiais e insumos comprados para a padaria</p>
+</div>
+
+{% if user.role == 'admin' %}
+<div class="card" style="margin-bottom:1.5rem">
+    <h2 class="card-title">➕ Novo Material</h2>
+    <div class="form-inline-grid">
+        <div class="form-group">
+            <label>Nome do Material *</label>
+            <input type="text" id="m-name" class="select-input" placeholder="Ex: Farinha de Trigo, Açúcar...">
+        </div>
+        <div class="form-group">
+            <label>Unidade de Medida *</label>
+            <select id="m-unit" class="select-input">
+                <option value="kg">kg (quilograma)</option>
+                <option value="g">g (grama)</option>
+                <option value="L">L (litro)</option>
+                <option value="mL">mL (mililitro)</option>
+                <option value="un">un (unidade)</option>
+                <option value="pacote">pacote</option>
+                <option value="saco">saco</option>
+                <option value="caixa">caixa</option>
+                <option value="duzia">dúzia</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Estoque Inicial</label>
+            <input type="number" id="m-stock" class="select-input" value="0" min="0">
+        </div>
+        <div class="form-group">
+            <label>Fornecedor Principal *</label>
+            <select id="m-supplier" class="select-input">
+                <option value="">— Selecione Fornecedor —</option>
+                {% for s in suppliers %}
+                    <option value="{{ s.supplier_id }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick="cadastrarMaterial()" style="margin-top:1rem">
+        + Cadastrar Material
+    </button>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2 class="card-title">📋 Lista de Materiais</h2>
+    {% if products %}
+    <table class="table" id="materials-table">
         <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nome</th>
-            <th>Preço (unidade)</th>
-            <th>Estoque</th>
-        </tr>
-        </thead>
-        <tbody>
-        {%- for product in products %}
             <tr>
+                <th>Material</th>
+                <th>Unidade</th>
+                <th>Estoque Atual</th>
+                <th>Último Preço Unit.</th>
+            </tr>
+        </thead>
+        <tbody id="materials-tbody">
+            {% for p in products %}
+            <tr>
+                <td><strong>{{ p.name }}</strong><br><small style="color:var(--text-muted)">🏭 {% if p.supplier %}{{ p.supplier.name }}{% else %}S/ Fornecedor{% endif %}</small></td>
+                <td><span class="badge" style="background:var(--bg-hover);color:var(--text-muted)">{{ p.unit_of_measure }}</span></td>
                 <td>
-                    {{ product.product_id }}
+                    <span class="badge {% if p.stock == 0 %}badge-danger{% elif p.stock <= 5 %}badge-warning{% else %}badge-ok{% endif %}">
+                        {{ p.stock }} {{ p.unit_of_measure }}
+                    </span>
                 </td>
                 <td>
-                    {{ product.name }}
-                </td>
-                <td>
-                    {{ "%.2f" | format(product.unit_price) }} R$
-                </td>
-                <td>
-                    {{ product.stock }}
+                    {% if p.unit_price %}
+                        R$ {{ p.unit_price | currency }}/{{ p.unit_of_measure }}
+                    {% else %}
+                        <span style="color:var(--text-muted)">—</span>
+                    {% endif %}
                 </td>
             </tr>
-        {%- endfor %}
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="empty-state" id="empty-state">
+        <p>Nenhum material cadastrado ainda.</p>
+        <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-muted)">
+            Exemplos: Farinha de Trigo (kg), Açúcar (kg), Fermento (pacote), Ovos (dúzia)...
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+async function cadastrarMaterial() {
+    const name = document.getElementById('m-name').value.trim();
+    const unit_of_measure = document.getElementById('m-unit').value;
+    const stock = parseInt(document.getElementById('m-stock').value) || 0;
+
+    const supplier_id = document.getElementById('m-supplier').value;
+
+    if (!name) { showToast('Nome do material é obrigatório!', 'error'); return; }
+    if (!supplier_id) { showToast('O Fornecedor é obrigatório!', 'error'); return; }
+
+    const token = sessionStorage.getItem('token');
+    try {
+        const res = await fetch('/api/v1/produtos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ name, unit_of_measure, stock, supplier_id })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showToast(data.message, 'success');
+            // Adiciona linha na tabela sem recarregar
+            const tbody = document.getElementById('materials-tbody');
+            const empty = document.getElementById('empty-state');
+            const table = document.getElementById('materials-table');
+            if (empty) empty.style.display = 'none';
+            if (table) table.style.display = '';
+            const tr = document.createElement('tr');
+            const stockClass = stock === 0 ? 'badge-danger' : stock <= 5 ? 'badge-warning' : 'badge-ok';
+            const supplierSelect = document.getElementById('m-supplier');
+            const supplierName = supplierSelect.options[supplierSelect.selectedIndex].text;
+            tr.innerHTML = `
+                <td><strong>${name}</strong><br><small style="color:var(--text-muted)">🏭 ${supplierName}</small></td>
+                <td><span class="badge" style="background:var(--bg-hover);color:var(--text-muted)">${unit_of_measure}</span></td>
+                <td><span class="badge ${stockClass}">${stock} ${unit_of_measure}</span></td>
+                <td><span style="color:var(--text-muted)">—</span></td>
+            `;
+            tbody.appendChild(tr);
+            document.getElementById('m-name').value = '';
+            document.getElementById('m-stock').value = '0';
+            document.getElementById('m-supplier').value = '';
+        } else {
+            showToast(data.message || 'Erro ao cadastrar.', 'error');
+        }
+    } catch(err) {
+        showToast('Erro de conexão.', 'error');
+    }
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast toast-' + type + ' toast-show';
+    setTimeout(() => { toast.className = 'toast'; }, 3500);
+}
+</script>
+
 {% endblock %}

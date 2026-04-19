@@ -1,15 +1,14 @@
 # coding: UTF-8
 """
-Script: Backend/models
-Création: jojo, le 12/04/2025
+Script: PanificadoraRM/auth/models
 """
 import uuid
 
 from sqlalchemy import UUID
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from app.extensions import db
 
-
-# Imports
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -21,7 +20,11 @@ class User(db.Model):
     role = db.Column(db.Text, nullable=False)
 
     sales = db.relationship('Sale', backref='user', lazy=True)
-    sale_items = db.relationship('SaleItem', backref='user', lazy=True)
 
-    def check_password(self, user_password):
-        return user_password == self.password
+    def set_password(self, raw_password):
+        """Armazena a senha como hash seguro (bcrypt via werkzeug)."""
+        self.password = generate_password_hash(raw_password)
+
+    def check_password(self, raw_password):
+        """Verifica a senha comparando com o hash armazenado."""
+        return check_password_hash(self.password, raw_password)

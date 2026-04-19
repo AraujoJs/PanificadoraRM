@@ -1,6 +1,188 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}Relatório de Gastos — PanificadoraRM{% endblock %}
 {% block main %}
-    <h2>Em construção!</h2>
-    <p>Ainda esta em desenvolvimento... Volte mais tarde!</p>
+
+<div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+        <h1>📊 Relatório de Despesas</h1>
+        <p class="page-subtitle">Análise completa dos gastos com entradas e contas pagas</p>
+    </div>
+    
+    <div class="print-hide" style="display:flex; gap: 15px; align-items:center;">
+        <form method="GET" action="{{ url_for('home.relatorio') }}" style="display:flex; align-items:center; gap:8px; margin: 0;">
+            <!-- Mês Seletor Estilizado como Botão -->
+            <label for="mes" class="btn" style="background-color: var(--bg-hover); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 0.5rem 1rem;">
+                📅 <span style="color: var(--text-muted); font-size: 0.85rem;">Mês:</span>
+                <input type="month" name="mes" id="mes" value="{{ mes_filtro }}" onchange="this.form.submit()" style="background: transparent; border: none; color: var(--text); outline: none; font-family: inherit; font-size: 0.9rem; cursor: pointer;">
+            </label>
+            
+            {% if mes_filtro %}
+                <a href="{{ url_for('home.relatorio') }}" class="btn btn-danger" style="text-decoration:none; display:flex; align-items:center; gap: 5px;">
+                    ✖ Limpar
+                </a>
+            {% endif %}
+        </form>
+        
+        <button onclick="window.print()" class="btn btn-primary" style="display:flex; align-items:center; gap: 8px; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.95rem;">
+            🖨️ Exportar em PDF
+        </button>
+    </div>
+</div>
+
+<!-- Cards de resumo -->
+<div class="stats-grid">
+    <div class="stat-card" style="background-color: var(--primary); color: white;">
+        <div class="stat-icon" style="background: rgba(255,255,255,0.2); color:white;">💰</div>
+        <div class="stat-value" style="font-size:1.5rem">R$ {{ despesa_total_super | currency }}</div>
+        <div class="stat-label" style="color:#ececec">Despesa Total (Compras + Contas)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-value" style="font-size:1.2rem">R$ {{ total_geral | currency }}</div>
+        <div class="stat-label">{{ total_compras }} Compras / Entradas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-value" style="font-size:1.2rem">R$ {{ total_geral_contas_pagas | currency }}</div>
+        <div class="stat-label">Contas Pagas</div>
+    </div>
+</div>
+
+<div class="relatorio-grid">
+
+    <!-- Gasto por fornecedor -->
+    <div class="card">
+        <h2 class="card-title">🏭 Gasto por Fornecedor</h2>
+        {% if gasto_por_fornecedor %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fornecedor / Tipo</th>
+                    <th>Nº Compras</th>
+                    <th>Total Pago</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in gasto_por_fornecedor %}
+                <tr>
+                    <td><strong>{{ f.name }}</strong></td>
+                    <td><span class="badge badge-warning">{{ f.qtd_compras }}</span></td>
+                    <td><strong style="color:var(--primary)">R$ {{ f.total_gasto | currency }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-msg">Nenhuma compra registrada.</p>
+        {% endif %}
+    </div>
+
+    <!-- Material com maior gasto -->
+    <div class="card">
+        <h2 class="card-title">📦 Materiais por Gasto</h2>
+        {% if top_materiais %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Material</th>
+                    <th>Qtd. Total</th>
+                    <th>Total Gasto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, m in top_materiais | enumerate %}
+                <tr>
+                    <td>
+                        {% if i == 0 %}🥇
+                        {% elif i == 1 %}🥈
+                        {% elif i == 2 %}🥉
+                        {% else %}{{ i + 1 }}
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ m.name }}</strong></td>
+                    <td>
+                        <span class="badge badge-ok">
+                            {{ m.total_qty }} {{ m.unit_of_measure }}
+                        </span>
+                    </td>
+                    <td><strong style="color:var(--primary)">R$ {{ m.total_gasto | currency }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-msg">Nenhum material comprado ainda.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Histórico mensal -->
+{% if historico_mensal %}
+<div class="card" style="margin-top:1.5rem">
+    <h2 class="card-title">📅 Histórico Mensal de Gastos</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mês</th>
+                <th>Total Gasto</th>
+                <th>Barra</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set max_val = historico_mensal | map(attribute='total') | map('float') | max %}
+            {% for h in historico_mensal %}
+            {% set pct = ((h.total | float) / max_val * 100) | round | int if max_val > 0 else 0 %}
+            <tr>
+                <td><strong>{{ h.mes }}</strong></td>
+                <td><strong style="color:var(--accent)">R$ {{ h.total | currency }}</strong></td>
+                <td style="width:40%">
+                    <div style="background:var(--bg-hover);border-radius:4px;height:10px;overflow:hidden">
+                        <div style="background:var(--accent);height:100%;width:{{ pct }}%;transition:width 0.5s ease;border-radius:4px"></div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% if contas_pagas %}
+<div class="card" style="margin-top:1.5rem">
+    <h2 class="card-title">💳 Histórico de Contas Pagas (Últimas 10)</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Descrição / Fornecedor</th>
+                <th>Data do Pagamento</th>
+                <th>Valor Pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for b in contas_pagas %}
+            <tr>
+                <td>
+                    <strong>{{ b.description }}</strong>
+                    {% if b.supplier %}
+                        <br><small style="color:var(--text-muted)">🏭 {{ b.supplier.name }}</small>
+                    {% endif %}
+                </td>
+                <td>{{ b.paid_date.strftime('%d/%m/%Y') }}</td>
+                <td><strong style="color:var(--primary)">R$ {{ b.amount | currency }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Somatório/Rodapé do Relatório -->
+<div class="card" style="margin-top: 2rem; background-color: var(--bg-hover); border-left: 4px solid var(--primary); text-align: right; padding: 1.5rem;">
+    <h2 style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 0.5rem;">Somatório Final do Período</h2>
+    <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary);">
+        R$ {{ despesa_total_super | currency }}
+    </div>
+</div>
+
 {% endblock %}

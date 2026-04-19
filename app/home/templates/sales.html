@@ -1,38 +1,40 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}Vendas — PanificadoraRM{% endblock %}
 {% block main %}
-    <h2>Lista de vendas</h2>
-    <table style="font-size: 80%">
+<div class="page-header">
+    <h1>Vendas</h1>
+    <p class="page-subtitle">Histórico de todas as vendas registradas</p>
+</div>
+<div class="card">
+    <h2 class="card-title">📋 Lista de Vendas</h2>
+    {% if sales %}
+    <table class="table">
         <thead>
-        <tr>
-            <th>Id</th>
-            <th>Horário</th>
-            <th>total</th>
-            <th>Metodo de pagamento</th>
-            <th>Vendedor</th>
-        </tr>
+            <tr>
+                <th>ID</th>
+                <th>Horário</th>
+                <th>Total</th>
+                <th>Pagamento</th>
+                <th>Vendedor</th>
+            </tr>
         </thead>
         <tbody>
-        {%- for sale in sales %}
+            {% for sale in sales %}
             <tr>
-                <td>
-                    {{ sale.sale_id }}
-                </td>
-                <td>
-                    {{ sale.sale_datetime.strftime('%d/%m/%Y %H:%M:%S') }}
-                </td>
-                <td>
-                    {{ "%.2f" | format(sale.total) }} R$
-                </td>
-                <td>
-                    {{ sale.payment_method }}
-                </td>
-                <td>
-                    {{ sale.user_name }}
-                </td>
-
+                <td><code style="font-size:0.75rem;color:var(--text-muted)">{{ sale.sale_id | string | truncate(12, true, '…') }}</code></td>
+                <td>{{ sale.sale_datetime.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td><strong style="color:var(--accent)">R$ {{ "%.2f" | format(sale.total | float) }}</strong></td>
+                <td><span class="badge badge-ok">{{ sale.payment_method }}</span></td>
+                <td>{{ sale.user_name }}</td>
             </tr>
-        {%- endfor %}
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="empty-state">
+        <p>Nenhuma venda registrada ainda.</p>
+        <a href="{{ url_for('home.nova_venda') }}" class="btn btn-primary" style="margin-top:1rem">+ Nova Venda</a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

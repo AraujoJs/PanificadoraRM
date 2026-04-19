@@ -1,203 +1,179 @@
 # coding: UTF-8
 """
 Script: PanificadoraRM/init_db
-Création: jojo, le 11/04/2025
+Recria o banco de dados com dados de exemplo de uma padaria real.
 """
-# Imports
 import logging
-
-from app import create_app
-
-# Configurations globales
-logging.getLogger().setLevel(logging.DEBUG)
-
-from app.products.models import Product
-from app.sales.models import Sale, SaleItem
-from app import db
-from app.auth.models import User
 import uuid
 
+from app import create_app
+from app.products.models import Product
+from app.suppliers.models import Supplier
+from app.stock_entries.models import StockEntry, StockEntryItem
+from app.bills.models import Bill
+from app import db
+from app.auth.models import User
 
-# Programme principal
+logging.getLogger().setLevel(logging.DEBUG)
+
+
 def main():
     app = create_app()
     with app.app_context():
         db.drop_all()
         db.create_all()
-        print("Tabelas criadas com sucesso!")
+        print("[OK] Tabelas criadas!")
 
-        # db.session.execute(db.text("DELETE FROM sale_items"))
-        # db.session.execute(db.text("DELETE FROM sales"))
-        # db.session.execute(db.text("DELETE FROM users"))
-        # db.session.query(Product).delete()
-        # db.session.commit()
-
-        p1 = Product(name="Coxinha", unit_price=5.0, stock=10)
-        p2 = Product(name="Pão Francês", unit_price=1.0, stock=100)
-        p3 = Product(name="Bolo formigueiro", unit_price=15.0, stock=5)
-
-        db.session.add_all([p1, p2, p3])
-        db.session.commit()
-
-        print("Itens adicionados!")
-
-        u1 = User(
-            user_id=uuid.UUID("768e0770-37d7-4485-8ef0-724a593db3d3"),
-            name="João",
-            email="joao@gmail.com",
-            password="12345678",
-            role="admin"
+        # ── Fornecedores ──────────────────────────────────────────────────
+        f1 = Supplier(
+            name="Moinho Sao Paulo",
+            contact="Paulo Moreira",
+            phone="(11) 91111-2222",
+            email="vendas@moinhsp.com"
         )
-        u2 = User(
-            user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72987e32"),
-            name="Maria",
-            email="maria@gmail.com",
-            password="87654321",
-            role="user")
-
-        u3 = User(
-            user_id=uuid.UUID("bdf9b718-1f36-435a-b39c-895c72983e55"),
-            name="Toto",
-            email="toto@gmail.com",
-            password="11111111",
-            role="user")
-
-        db.session.add_all([u1, u2, u3])
+        f2 = Supplier(
+            name="Atacadista Central",
+            contact="Carla Alves",
+            phone="(11) 93333-4444",
+            email="pedidos@atacentral.com"
+        )
+        f3 = Supplier(
+            name="Distribuidora Norte",
+            contact="Ricardo Lima",
+            phone="(11) 95555-6666",
+            email="contato@distnorte.com"
+        )
+        db.session.add_all([f1, f2, f3])
         db.session.commit()
+        print("[OK] Fornecedores criados!")
 
-        print("Usuarios adicionados!")
+        # ── Materiais / Insumos da Padaria ───────────────────────────────
+        # (name, unit_of_measure, stock_inicial, supplier)
+        materiais = [
+            ("Farinha de Trigo",   "kg",     0, f1.supplier_id),
+            ("Acucar Refinado",    "kg",     0, f1.supplier_id),
+            ("Fermento Biologico", "pacote", 0, f1.supplier_id),
+            ("Sal Refinado",       "kg",     0, f1.supplier_id),
+            ("Manteiga",           "kg",     0, f2.supplier_id),
+            ("Ovos",               "duzia",  0, f2.supplier_id),
+            ("Leite Integral",     "L",      0, f2.supplier_id),
+            ("Chocolate em Po",    "kg",     0, f3.supplier_id),
+            ("Oleo de Soja",       "L",      0, f3.supplier_id),
+            ("Embalagens Saco",    "caixa",  0, f3.supplier_id),
+        ]
+        produtos = []
+        for name, unit, stock, supp_id in materiais:
+            p = Product(name=name, unit_of_measure=unit, stock=stock, supplier_id=supp_id)
+            db.session.add(p)
+            produtos.append(p)
+        db.session.commit()
+        print(f"[OK] {len(produtos)} materiais cadastrados!")
 
-        print("User Maria vendas:")
-        user_id = u2.user_id
-        user = User.query.filter_by(user_id=user_id).first()
-        if user:
-            sale_id = uuid.uuid4()
-            s1 = Sale(sale_id=sale_id, total=0.0, user_id=user.user_id)
+        # ── Usuarios ──────────────────────────────────────────────────────
+        u1 = User(name="Joao", email="joao@panificadora.com", role="admin")
+        u1.set_password("admin1234")
 
-            quantity = 5
-            i1 = SaleItem(
-                quantity=quantity,
-                product_id=p1.product_id,
-                subtotal=(p1.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id)
-            s1.total += float(i1.subtotal)
+        u2 = User(name="Maria", email="maria@panificadora.com", role="user")
+        u2.set_password("maria1234")
 
-            quantity = 2
-            i2 = SaleItem(
-                quantity=quantity,
-                subtotal=(p3.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id,
-                product_id=p3.product_id)
-
-            s1.total += float(i2.subtotal)
-            payment_method = "pix"
-            s1.payment_method = payment_method
-            db.session.add(s1)
-            db.session.commit()
-            print("Venda 1 adicionada!")
-            db.session.add_all([i1, i2])
-            db.session.commit()
-            print("Itens da venda 1 adicionados!")
+        db.session.add_all([u1, u2])
+        db.session.commit()
+        print("[OK] Usuarios criados!")
 
 
-            sale_id2 = uuid.uuid4()
-            s2 = Sale(sale_id=sale_id2, total=0.0, user_id=user.user_id)
+        # ── Entrada 1: Compra de farinhas e acucar no Moinho SP ───────────
+        p_farinha  = produtos[0]  # Farinha de Trigo
+        p_acucar   = produtos[1]  # Acucar
+        p_sal      = produtos[3]  # Sal
 
-            quantity = 20
-            i3 = SaleItem(
-                quantity=quantity,
-                product_id=p2.product_id,
-                subtotal=(p2.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id2)
+        eid1 = uuid.uuid4()
+        e1 = StockEntry(entry_id=eid1, supplier_id=f1.supplier_id,
+                        user_id=u1.user_id, note="Compra mensal de base")
+        ei1 = StockEntryItem(entry_id=eid1, product_id=p_farinha.product_id,  quantity=50, unit_cost=3.50,  subtotal=175.0)
+        ei2 = StockEntryItem(entry_id=eid1, product_id=p_acucar.product_id,   quantity=20, unit_cost=4.20,  subtotal=84.0)
+        ei3 = StockEntryItem(entry_id=eid1, product_id=p_sal.product_id,      quantity=5,  unit_cost=1.80,  subtotal=9.0)
+        e1.total_cost = 175.0 + 84.0 + 9.0
+        p_farinha.stock += 50
+        p_acucar.stock  += 20
+        p_sal.stock     += 5
+        db.session.add_all([e1, ei1, ei2, ei3])
+        db.session.commit()
+        print("[OK] Entrada 1 registrada (Moinho Sao Paulo)!")
 
-            s2.total += float(i3.subtotal)
+        # ── Entrada 2: Compra de ovos, manteiga e leite no Atacadista ─────
+        p_manteiga = produtos[4]  # Manteiga
+        p_ovos     = produtos[5]  # Ovos
+        p_leite    = produtos[6]  # Leite
 
-            quantity = 2
-            i4 = SaleItem(
-                quantity=quantity,
-                subtotal=(p3.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id2,
-                product_id=p3.product_id)
+        eid2 = uuid.uuid4()
+        e2 = StockEntry(entry_id=eid2, supplier_id=f2.supplier_id,
+                        user_id=u1.user_id, note="Reposicao semanal - frios e ovos")
+        ei4 = StockEntryItem(entry_id=eid2, product_id=p_manteiga.product_id, quantity=10, unit_cost=22.00, subtotal=220.0)
+        ei5 = StockEntryItem(entry_id=eid2, product_id=p_ovos.product_id,     quantity=15, unit_cost=14.50, subtotal=217.5)
+        ei6 = StockEntryItem(entry_id=eid2, product_id=p_leite.product_id,    quantity=20, unit_cost=5.00,  subtotal=100.0)
+        e2.total_cost = 220.0 + 217.5 + 100.0
+        p_manteiga.stock += 10
+        p_ovos.stock     += 15
+        p_leite.stock    += 20
+        db.session.add_all([e2, ei4, ei5, ei6])
+        db.session.commit()
+        print("[OK] Entrada 2 registrada (Atacadista Central)!")
 
-            s2.total += float(i4.subtotal)
-            payment_method = "Debito"
-            s2.payment_method = payment_method
-            db.session.add(s2)
-            db.session.commit()
-            print("Venda 2 adicionada!")
-            db.session.add_all([i3, i4])
-            db.session.commit()
-            print("Itens da venda 2 adicionados!")
+        # ── Entrada 3: Chocolate e oleo na Distribuidora Norte ─────────────
+        p_choco = produtos[7]  # Chocolate
+        p_oleo  = produtos[8]  # Oleo
 
-        else:
-            print("User invalido!")
+        eid3 = uuid.uuid4()
+        e3 = StockEntry(entry_id=eid3, supplier_id=f3.supplier_id,
+                        user_id=u2.user_id, note="Compra especial - confeitaria")
+        ei7 = StockEntryItem(entry_id=eid3, product_id=p_choco.product_id, quantity=5,  unit_cost=18.00, subtotal=90.0)
+        ei8 = StockEntryItem(entry_id=eid3, product_id=p_oleo.product_id,  quantity=10, unit_cost=7.50,  subtotal=75.0)
+        e3.total_cost = 90.0 + 75.0
+        p_choco.stock += 5
+        p_oleo.stock  += 10
+        db.session.add_all([e3, ei7, ei8])
+        db.session.commit()
+        print("[OK] Entrada 3 registrada (Distribuidora Norte)!")
 
-        print("User Pedro vendas:")
-        user_id = u3.user_id
-        user = User.query.filter_by(user_id=user_id).first()
+        total_gasto = e1.total_cost + e2.total_cost + e3.total_cost
+        print(f"\n[OK] Total gasto em compras: R$ {total_gasto:.2f}")
 
-        if user:
-            sale_id = uuid.uuid4()
-            s1 = Sale(sale_id=sale_id, total=0.0, user_id=user.user_id)
-
-            quantity = 2
-            i1 = SaleItem(
-                quantity=quantity,
-                product_id=p2.product_id,
-                subtotal=(p2.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id)
-            s1.total += float(i1.subtotal)
-
-            quantity = 1
-            i2 = SaleItem(
-                quantity=quantity,
-                subtotal=(p3.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id,
-                product_id=p3.product_id)
-
-            s1.total += float(i2.subtotal)
-            payment_method = "Dinheiro"
-            s1.payment_method = payment_method
-            db.session.add(s1)
-            db.session.commit()
-
-            print("Venda 1 adicionada!")
-            db.session.add_all([i1, i2])
-            db.session.commit()
-            print("Itens da venda 1 adicionados!")
+        # ── Contas a Pagar ────────────────────────────────────────────────
+        from datetime import date, timedelta
+        hoje = date.today()
+        b1 = Bill(
+            description=f"Boleto Referente a Entrada 1 (Moinho SP)",
+            amount=e1.total_cost,
+            due_date=hoje - timedelta(days=2), # Vencida
+            supplier_id=f1.supplier_id,
+            stock_entry_id=eid1,
+            user_id=u1.user_id,
+            note="Boleto 30 dias"
+        )
+        b2 = Bill(
+            description=f"Conta Luz da Padaria",
+            amount=350.00,
+            due_date=hoje + timedelta(days=5), # Pendente
+            user_id=u1.user_id
+        )
+        b3 = Bill(
+            description="Boleto Ref. Entrada 2 (Atacadista Central)",
+            amount=e2.total_cost,
+            due_date=hoje - timedelta(days=10),
+            paid_date=hoje - timedelta(days=9), # Paga
+            supplier_id=f2.supplier_id,
+            stock_entry_id=eid2,
+            user_id=u1.user_id
+        )
+        db.session.add_all([b1, b2, b3])
+        db.session.commit()
+        print("[OK] Contas a pagar adicionadas!")
 
 
-            sale_id2 = uuid.uuid4()
-            s2 = Sale(sale_id=sale_id2, total=0.0, user_id=user.user_id)
-
-            quantity = 20
-            i3 = SaleItem(
-                quantity=quantity,
-                product_id=p2.product_id,
-                subtotal=(p2.unit_price * quantity),
-                user_id=user_id,
-                sale_id=sale_id2)
-
-            s2.total += float(i3.subtotal)
-            payment_method = "Pix"
-            s2.payment_method = payment_method
-            db.session.add(s2)
-            db.session.commit()
-            print("Venda 2 adicionada!")
-            db.session.add(i3)
-            db.session.commit()
-            print("Itens da venda 2 adicionados!")
-
-        else:
-            print("User invalido!")
+        print("\n--- Credenciais de acesso ---")
+        print("  Admin -> joao@panificadora.com / admin1234")
+        print("  User  -> maria@panificadora.com / maria1234")
 
 
 if __name__ == '__main__':
     main()
-# Fin

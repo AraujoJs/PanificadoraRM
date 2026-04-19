@@ -7,6 +7,9 @@
     <title>Panificadora-RM</title>
 </head>
 <body>
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ url_for('static', filename='icon.png') }}" alt="PanificadoraRM Logo" style="width: 130px; height: auto;">
+</div>
 <div class="login-container">
     <h2>Entrar</h2>
     <form id="login-form">
@@ -23,6 +26,10 @@
         <span>Não tem conta? </span><a href="{{ url_for('auth.register') }}">Cadastre-se</a>
     </div>
 </div>
+
+<footer class="login-footer">
+    <p>© 2026 JBC Software — v1.0</p>
+</footer>
 
 <script>
     document.getElementById("login-form").addEventListener("submit", async (e) => {

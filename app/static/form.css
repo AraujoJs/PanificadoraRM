@@ -1,7 +1,9 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    /* Soft bakery/yellowish background based on logo */
+    background-color: #fcba03;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -83,4 +85,12 @@ body {
 
 .login-container .links a:hover {
     text-decoration: underline;
+}
+
+.login-footer {
+    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    text-align: center;
+    font-family: Arial, sans-serif;
 }

@@ -14,14 +14,19 @@ def token_required(f):
     def decorated_function(*args, **kwargs):
         token = None
         if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]  # Pega o token após o "Bearer"
+            parts = request.headers['Authorization'].split(" ")
+            if len(parts) == 2:
+                token = parts[1]
 
         if not token:
             return jsonify({'message': 'Token é necessário'}), 403
 
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['user_id']
+            user_id_str = payload['user_id']
+            # JWT armazena user_id como string; converter para UUID para o SQLAlchemy
+            import uuid as _uuid
+            user_id = _uuid.UUID(user_id_str)
             current_user = User.query.filter_by(user_id=user_id).first()
             if not current_user:
                 return jsonify({'message': 'Usuário não encontrado'}), 404
@@ -29,7 +34,9 @@ def token_required(f):
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token expirado.'}), 401
         except jwt.InvalidTokenError:
-            return jsonify({'message': 'Token invalido.'}), 401
+            return jsonify({'message': 'Token inválido.'}), 401
+        except Exception as e:
+            return jsonify({'message': f'Erro de autenticação: {str(e)}'}), 401
 
         return f(current_user, *args, **kwargs)
-    return decorated_function
+    return decorated_function

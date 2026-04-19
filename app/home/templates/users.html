@@ -1,33 +1,37 @@
 {% extends 'layout.html' %}
-{% block title %}{{ super() }} - Site Map{% endblock %}
+{% block title %}Usuários — PanificadoraRM{% endblock %}
 {% block main %}
-    <h2>Usuarios</h2>
-    <table style="font-size: 80%">
+<div class="page-header">
+    <h1>Usuários</h1>
+    <p class="page-subtitle">Gerenciamento de usuários do sistema</p>
+</div>
+<div class="card">
+    <h2 class="card-title">👤 Lista de Usuários</h2>
+    {% if users %}
+    <table class="table">
         <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Cargo</th>
-        </tr>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Perfil</th>
+            </tr>
         </thead>
         <tbody>
-        {%- for user in users %}
+            {% for u in users %}
             <tr>
+                <td><strong>{{ u.name }}</strong></td>
+                <td>{{ u.email }}</td>
                 <td>
-                    {{ user.user_id }}
-                </td>
-                <td>
-                    {{ user.name }}
-                </td>
-                <td>
-                    {{ user.email }}
-                </td>
-                <td>
-                    {{ user.role }}
+                    <span class="badge {% if u.role == 'admin' %}badge-warning{% else %}badge-ok{% endif %}">
+                        {{ u.role }}
+                    </span>
                 </td>
             </tr>
-        {%- endfor %}
+            {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div class="empty-state"><p>Nenhum usuário encontrado.</p></div>
+    {% endif %}
+</div>
 {% endblock %}
