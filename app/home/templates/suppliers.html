@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+{% block title %}Fornecedores — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header">
+    <h1>Fornecedores</h1>
+    <p class="page-subtitle">Cadastro de fornecedores para reposição de estoque</p>
+</div>
+
+<!-- Formulário de cadastro (admin) -->
+{% if user.role == 'admin' %}
+<div class="card" style="margin-bottom:1.5rem">
+    <h2 class="card-title">➕ Novo Fornecedor</h2>
+    <div class="form-inline-grid">
+        <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" id="f-name" class="select-input" placeholder="Ex: Distribuidora Pão Quente">
+        </div>
+        <div class="form-group">
+            <label>Contato</label>
+            <input type="text" id="f-contact" class="select-input" placeholder="Nome do responsável">
+        </div>
+        <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" id="f-phone" class="select-input" placeholder="(11) 99999-9999">
+        </div>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="f-email" class="select-input" placeholder="contato@fornecedor.com">
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick="cadastrarFornecedor()" style="margin-top:1rem">
+        + Cadastrar Fornecedor
+    </button>
+</div>
+{% endif %}
+
+<!-- Lista de fornecedores -->
+<div class="card">
+    <h2 class="card-title">🏭 Lista de Fornecedores</h2>
+    {% if suppliers %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Telefone</th>
+                <th>E-mail</th>
+            </tr>
+        </thead>
+        <tbody id="suppliers-tbody">
+            {% for s in suppliers %}
+            <tr>
+                <td><strong>{{ s.name }}</strong></td>
+                <td>{{ s.contact or '—' }}</td>
+                <td>{{ s.phone or '—' }}</td>
+                <td>{{ s.email or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state" id="empty-state">
+        <p>Nenhum fornecedor cadastrado.</p>
+    </div>
+    <table class="table" id="suppliers-table" style="display:none">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Telefone</th>
+                <th>E-mail</th>
+            </tr>
+        </thead>
+        <tbody id="suppliers-tbody"></tbody>
+    </table>
+    {% endif %}
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+async function cadastrarFornecedor() {
+    const name = document.getElementById('f-name').value.trim();
+    const contact = document.getElementById('f-contact').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+
+    if (!name) { showToast('Nome é obrigatório!', 'error'); return; }
+
+    const token = sessionStorage.getItem('token');
+    try {
+        const res = await fetch('/api/v1/fornecedores/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ name, contact, phone, email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showToast(data.message, 'success');
+            // Adiciona a linha na tabela sem recarregar
+            const tbody = document.getElementById('suppliers-tbody');
+            const empty = document.getElementById('empty-state');
+            const table = document.getElementById('suppliers-table');
+            if (empty) empty.style.display = 'none';
+            if (table) table.style.display = '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><strong>${name}</strong></td><td>${contact || '—'}</td><td>${phone || '—'}</td><td>${email || '—'}</td>`;
+            tbody.appendChild(tr);
+            // Limpa campos
+            ['f-name','f-contact','f-phone','f-email'].forEach(id => document.getElementById(id).value = '');
+        } else {
+            showToast(data.message || 'Erro ao cadastrar.', 'error');
+        }
+    } catch (err) {
+        showToast('Erro de conexão.', 'error');
+    }
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast toast-' + type + ' toast-show';
+    setTimeout(() => { toast.className = 'toast'; }, 3500);
+}
+</script>
+
+{% endblock %}

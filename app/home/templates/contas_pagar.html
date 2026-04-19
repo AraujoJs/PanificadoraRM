@@ -1,0 +1,256 @@
+{% extends 'layout.html' %}
+{% block title %}Contas a Pagar — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+    <div>
+        <h1>💳 Contas a Pagar</h1>
+        <p class="page-subtitle">Controle de boletos, faturas e pagamentos a fornecedores</p>
+    </div>
+    {% if user.role == 'admin' %}
+    <button class="btn btn-primary" onclick="toggleForm()">＋ Nova Conta</button>
+    {% endif %}
+</div>
+
+<!-- Formulário de Nova Conta -->
+{% if user.role == 'admin' %}
+<div class="card" id="form-nova-conta" style="display:none; margin-bottom:1.5rem">
+    <h2 class="card-title">Nova Conta</h2>
+    <div class="form-inline-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr))">
+        <div class="form-group">
+            <label>Descrição *</label>
+            <input type="text" id="bill-desc" class="select-input" placeholder="Ex: Boleto farinha Moinho SP">
+        </div>
+        <div class="form-group">
+            <label>Valor (R$) *</label>
+            <input type="text" id="bill-amount" class="select-input" placeholder="R$ 0,00" oninput="maskMoney(this)">
+        </div>
+        <div class="form-group">
+            <label>Vencimento *</label>
+            <input type="date" id="bill-due" class="select-input" value="{{ hoje }}">
+        </div>
+        <div class="form-group">
+            <label>Fornecedor (Opcional)</label>
+            <select id="bill-supplier" class="select-input">
+                <option value="">— Selecione —</option>
+                {% for s in suppliers %}
+                <option value="{{ s.supplier_id }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="grid-column: 1 / -1">
+            <label>Observação (Opcional)</label>
+            <input type="text" id="bill-note" class="select-input" placeholder="Referente à NF 12345...">
+        </div>
+    </div>
+    <div style="margin-top:1rem; display:flex; gap:0.5rem">
+        <button class="btn btn-success" onclick="salvarConta()">✅ Salvar</button>
+        <button class="btn btn-danger" onclick="toggleForm()">Cancelar</button>
+    </div>
+</div>
+{% endif %}
+
+<!-- Tabs de Status -->
+<div style="margin-bottom:1rem; display:flex; gap:0.5rem">
+    <a href="?status=todas" class="badge {% if request.args.get('status') not in ['pendente', 'vencida', 'paga'] %}badge-primary{% endif %}" style="padding:0.5rem 1rem; text-decoration:none">Todas</a>
+    <a href="?status=pendente" class="badge {% if request.args.get('status') == 'pendente' %}badge-warning{% endif %}" style="padding:0.5rem 1rem; text-decoration:none">Pendentes</a>
+    <a href="?status=vencida" class="badge {% if request.args.get('status') == 'vencida' %}badge-danger{% endif %}" style="padding:0.5rem 1rem; text-decoration:none">Vencidas</a>
+    <a href="?status=paga" class="badge {% if request.args.get('status') == 'paga' %}badge-ok{% endif %}" style="padding:0.5rem 1rem; text-decoration:none">Pagas</a>
+</div>
+
+<div class="card">
+    <h2 class="card-title">📋 Lista de Contas</h2>
+    {% set status_filter = request.args.get('status', 'todas') %}
+    
+    <table class="table" id="bills-table">
+        <thead>
+            <tr>
+                <th>Descrição / Fornecedor</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set ns = namespace(has_bills=false) %}
+            {% for b in contas %}
+                {# Lógica simples de filtro no template para evitar muitas queries #}
+                {% set mostrar = true %}
+                {% if status_filter == 'pendente' and b.status != 'pendente' %} {% set mostrar = false %} {% endif %}
+                {% if status_filter == 'vencida' and b.status != 'vencido' %} {% set mostrar = false %} {% endif %}
+                {% if status_filter == 'paga' and b.status != 'pago' %} {% set mostrar = false %} {% endif %}
+                
+                {% if mostrar %}
+                    {% set ns.has_bills = true %}
+                    <tr id="bill-row-{{ b.bill_id }}">
+                        <td>
+                            <strong>{{ b.description }}</strong>
+                            {% if b.supplier %}
+                                <br><small style="color:var(--text-muted)">🏭 {{ b.supplier.name }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ b.due_date.strftime('%d/%m/%Y') }}
+                            {% if b.status == 'vencido' %}
+                                <span style="color:var(--danger)">⚠️</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>R$ {{ b.amount | currency }}</strong></td>
+                        <td>
+                            {% if b.status == 'pago' %}
+                                <span class="badge badge-ok">Paga em {{ b.paid_date.strftime('%d/%m/%Y') }}</span>
+                            {% elif b.status == 'vencido' %}
+                                <span class="badge badge-danger">Vencida</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pendente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if b.status != 'pago' and user.role == 'admin' %}
+                                <button class="btn btn-sm btn-success" onclick="pagarConta('{{ b.bill_id }}')">✔️ Marcar como Pago</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            
+            {% if not ns.has_bills %}
+                <tr id="no-bills-row">
+                    <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted)">
+                        Nenhuma conta encontrada para o filtro atual.
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    function toggleForm() {
+        const form = document.getElementById('form-nova-conta');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        
+        if (form.style.display === 'block') {
+            const row = document.getElementById('no-bills-row');
+            if (row) row.style.display = 'none';
+        }
+    }
+
+    function parseMoney(str) {
+        if (!str) return 0;
+        let clean = str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+        let val = parseFloat(clean);
+        return isNaN(val) ? 0 : val;
+    }
+
+    function maskMoney(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (!value) { 
+            input.value = ''; 
+            return; 
+        }
+        value = (parseInt(value) / 100).toFixed(2);
+        value = value.replace(".", ",");
+        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        input.value = "R$ " + value;
+    }
+
+    async function salvarConta() {
+        const desc = document.getElementById('bill-desc').value.trim();
+        const amountStr = document.getElementById('bill-amount').value;
+        const due = document.getElementById('bill-due').value;
+        const supplier = document.getElementById('bill-supplier').value;
+        const note = document.getElementById('bill-note').value;
+
+        const amount = parseMoney(amountStr);
+
+        if (!desc || amount <= 0 || !due) {
+            showToast('Preencha a descrição, valor válido e vencimento!', 'error');
+            return;
+        }
+
+        const payload = {
+            description: desc,
+            amount: amount,
+            due_date: due,
+            supplier_id: supplier || null,
+            note: note
+        };
+
+        const token = sessionStorage.getItem('token');
+        try {
+            const res = await fetch('/api/v1/contas-pagar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                showToast(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast(data.message || 'Erro ao salvar.', 'error');
+            }
+        } catch(err) {
+            showToast('Erro de conexão.', 'error');
+        }
+    }
+
+    async function pagarConta(billId) {
+        console.log("Marking as paid:", billId);
+
+        const token = sessionStorage.getItem('token');
+        try {
+            const res = await fetch(`/api/v1/contas-pagar/${billId}/pagar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({}) // hoje
+            });
+            
+            const data = await res.json();
+            if (res.ok) {
+                showToast(data.message, 'success');
+                
+                // Update inline for better UX!
+                const row = document.getElementById(`bill-row-${billId}`);
+                if (row) {
+                    const paidDateStr = data.bill.paid_date_br;
+                    
+                    const statusTd = row.querySelectorAll('td')[3];
+                    statusTd.innerHTML = `<span class="badge badge-ok">Paga em ${paidDateStr}</span>`;
+                    
+                    const actionTd = row.querySelectorAll('td')[4];
+                    actionTd.innerHTML = '';
+                    
+                    const dueTd = row.querySelectorAll('td')[1];
+                    if (dueTd.innerHTML.includes('⚠️')) {
+                        dueTd.innerHTML = dueTd.innerHTML.replace('⚠️', '');
+                    }
+                }
+            } else {
+                showToast(data.message || 'Erro ao pagar.', 'error');
+            }
+        } catch(err) {
+            showToast('Erro de conexão.', 'error');
+        }
+    }
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast toast-' + type + ' toast-show';
+        setTimeout(() => { toast.className = 'toast'; }, 3500);
+    }
+</script>
+
+{% endblock %}

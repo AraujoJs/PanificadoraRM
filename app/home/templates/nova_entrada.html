@@ -1,0 +1,253 @@
+{% extends 'layout.html' %}
+{% block title %}Nova Entrada de Estoque — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header">
+    <h1>Nova Entrada de Estoque</h1>
+    <p class="page-subtitle">Registre uma compra completa de forma ágil</p>
+</div>
+
+<div class="card" style="max-width: 900px; margin: 0 auto;">
+    <h2 class="card-title">🧾 Detalhes da Compra</h2>
+
+    <div class="form-inline-grid">
+        <div class="form-group" style="justify-content: flex-end;">
+            <label>Fornecedor *</label>
+            <select id="supplier-id" class="select-input" onchange="onChangeSupplier()">
+                <option value="">— Selecione o Fornecedor —</option>
+                {% for s in suppliers %}
+                    <option value="{{ s.supplier_id }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+            {% if not suppliers %}
+            <small style="color:var(--text-muted);margin-top:0.3rem;display:block">
+                ⚠️ Nenhum fornecedor cadastrado.
+            </small>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="justify-content: flex-end;">
+            <label>Observação (opcional)</label>
+            <input type="text" id="entry-note" class="select-input" placeholder="Ex: Compra semanal">
+        </div>
+    </div>
+
+    <div id="empty-supplier" class="empty-state" style="margin-top: 1.5rem;">
+        <p>Selecione um fornecedor acima para listar seus materiais.</p>
+    </div>
+
+    <div id="supplier-products-wrapper" style="display:none; margin-top: 1.5rem;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th style="width: 15%">Custo Unit.</th>
+                    <th style="width: 15%">Quantidade</th>
+                    <th style="width: 20%">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="products-tbody">
+                {% for p in products %}
+                <tr class="prod-row" data-supplier="{{ p.supplier_id or 'none' }}" data-pid="{{ p.product_id }}" style="display:none;">
+                    <td>
+                        <strong>{{ p.name }}</strong>
+                        <br><small style="color:var(--text-muted)">Estoque atual: {{ p.stock }} {{ p.unit_of_measure }}</small>
+                    </td>
+                    <td>
+                        <input type="text" id="cost-{{ p.product_id }}" class="select-input" 
+                               placeholder="R$ 0,00" oninput="maskMoney(this); recalcTotals();"
+                               style="font-family: monospace; text-align: right;">
+                    </td>
+                    <td>
+                        <input type="number" id="qty-{{ p.product_id }}" value="" min="0" step="1"
+                               class="select-input" placeholder="0" oninput="recalcTotals();"
+                               style="text-align: center;">
+                    </td>
+                    <td style="text-align: right;">
+                        <strong id="sub-{{ p.product_id }}" style="color:var(--accent);">R$ 0,00</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Footer Total -->
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+            <div style="font-size: 1.4rem; font-weight: 600;">
+                Custo Total: <span id="grand-total" style="color: var(--accent);">R$ 0,00</span>
+            </div>
+            <div>
+                <button class="btn btn-success" id="btn-registrar" onclick="finalizarEntrada()" style="padding: 0.8rem 2rem; font-size: 1.1rem;">
+                    ✅ Registrar Entrada
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    // Utils: Mascara e Parse de Moeda Brasileira
+    function maskMoney(input) {
+        let value = input.value.replace(/\D/g, "");
+        if (!value) { 
+            input.value = ''; 
+            return; 
+        }
+        value = (parseInt(value) / 100).toFixed(2);
+        value = value.replace(".", ",");
+        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        input.value = "R$ " + value;
+    }
+
+    function parseMoney(str) {
+        if (!str) return 0;
+        let clean = str.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+        let val = parseFloat(clean);
+        return isNaN(val) ? 0 : val;
+    }
+
+    function formatMoney(num) {
+        let val = num.toFixed(2).replace('.', ',');
+        val = val.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        return "R$ " + val;
+    }
+
+    // Logic
+    function onChangeSupplier() {
+        const suppId = document.getElementById('supplier-id').value;
+        const emptyState = document.getElementById('empty-supplier');
+        const wrapper = document.getElementById('supplier-products-wrapper');
+        const rows = document.querySelectorAll('.prod-row');
+
+        if (!suppId) {
+            emptyState.style.display = 'block';
+            wrapper.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            wrapper.style.display = 'block';
+            
+            let countVisible = 0;
+            rows.forEach(row => {
+                if (row.getAttribute('data-supplier') === suppId) {
+                    row.style.display = 'table-row';
+                    countVisible++;
+                } else {
+                    row.style.display = 'none';
+                }
+                // Reseta inputs on switch
+                row.querySelector('input[type="text"]').value = '';
+                row.querySelector('input[type="number"]').value = '';
+                row.querySelector('strong[id^="sub-"]').textContent = 'R$ 0,00';
+            });
+
+            if(countVisible === 0) {
+                // If supplier has no registered products
+                emptyState.innerHTML = '<p>⚠️ Nenhum material vinculado a este fornecedor.</p>';
+                emptyState.style.display = 'block';
+                wrapper.style.display = 'none';
+            }
+        }
+        recalcTotals();
+    }
+
+    function recalcTotals() {
+        let grandTotal = 0;
+        const suppId = document.getElementById('supplier-id').value;
+        const rows = document.querySelectorAll('.prod-row');
+
+        rows.forEach(row => {
+            if (row.style.display === 'table-row' && row.getAttribute('data-supplier') === suppId) {
+                const pid = row.getAttribute('data-pid');
+                const costInput = document.getElementById('cost-' + pid).value;
+                const qtyInput = document.getElementById('qty-' + pid).value;
+
+                const cost = parseMoney(costInput);
+                const qty = parseInt(qtyInput) || 0;
+
+                const sub = cost * qty;
+                document.getElementById('sub-' + pid).textContent = formatMoney(sub);
+                grandTotal += sub;
+            }
+        });
+
+        document.getElementById('grand-total').textContent = formatMoney(grandTotal);
+    }
+
+    async function finalizarEntrada() {
+        const suppId = document.getElementById('supplier-id').value;
+        if (!suppId) { showToast('Selecione um fornecedor!', 'error'); return; }
+
+        const rows = document.querySelectorAll('.prod-row[style="display: table-row;"]');
+        const items = [];
+
+        rows.forEach(row => {
+            if(row.getAttribute('data-supplier') === suppId) {
+                const pid = row.getAttribute('data-pid');
+                const cost = parseMoney(document.getElementById('cost-' + pid).value);
+                const qty = parseInt(document.getElementById('qty-' + pid).value) || 0;
+
+                if (qty > 0) {
+                    if (cost <= 0) {
+                        showToast(`Custo unitário zerado para um dos itens selecionados.`, 'error');
+                        throw new Error("Validation");
+                    }
+                    items.push({
+                        product_id: pid,
+                        quantity: qty,
+                        unit_cost: cost
+                    });
+                }
+            }
+        });
+
+        if (items.length === 0) {
+            showToast('Preencha a quantidade de pelo menos um produto para continuar.', 'error');
+            return;
+        }
+
+        const note = document.getElementById('entry-note').value.trim() || null;
+
+        const btn = document.getElementById('btn-registrar');
+        btn.disabled = true;
+        btn.textContent = 'Processando...';
+
+        try {
+            const token = sessionStorage.getItem('token');
+            const res = await fetch('/api/v1/entradas-estoque/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ supplier_id: suppId, items, note })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                showToast('✅ Entrada registrada! Valor: ' + formatMoney(data.total_cost), 'success');
+                setTimeout(() => window.location.reload(), 1800);
+            } else {
+                showToast(data.message || 'Erro ao registrar.', 'error');
+                btn.disabled = false;
+                btn.textContent = '✅ Registrar Entrada';
+            }
+        } catch (err) {
+            if(err.message !== "Validation") {
+                showToast('Erro de conexão.', 'error');
+            }
+            btn.disabled = false;
+            btn.textContent = '✅ Registrar Entrada';
+        }
+    }
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast toast-' + type + ' toast-show';
+        setTimeout(() => { toast.className = 'toast'; }, 3500);
+    }
+</script>
+
+{% endblock %}
