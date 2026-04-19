@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Démo{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home-user.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='interno-custom.css')}}">
+
+
+</head>
+<body>
+{% for category, message in get_flashed_messages(with_categories=True) %}
+    <div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+<nav>
+  <!-- Cabeçalho com ☰ e logout -->
+  <div class="menu-header">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+    <div class="container-link-logout">
+      <a class="link-logout" onclick="logout()">
+        <i class="fa-sharp fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Menu de navegação -->
+  <div class="menu-container">
+    <div class="menu" id="menu">
+      <a href="{{ url_for('interno.compras') }}">Compras</a>
+      <a href="{{ url_for('interno.produtos') }}">Produtos</a>
+      <a href="{{ url_for('interno.fornecedores') }}">Fornecedores</a>
+      <a href="{{ url_for('interno.relatorio', today=True) }}">Relatórios</a>
+    </div>
+  </div>
+</nav>
+
+{% block main %}
+{% endblock %}
+<script src="https://kit.fontawesome.com/39ef9be472.js" crossorigin="anonymous"></script>
+<script>
+      function toggleMenu() {
+    document.getElementById("menu").classList.toggle("active");
+  }
+
+
+    function logout() {
+        const token = sessionStorage.getItem("token"); // ou localStorage
+
+        fetch("/auth/sair", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = "/auth/entrar";
+            } else {
+                alert("Erro ao sair.");
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<form>
+    <div style="display: flex">
+        <div>
+            <label>Filtrar por:</label>
+
+            <select name="filtro" id="filtro">
+                <option value="all">-- Todos --</option>
+
+                <option value="fornecedor" {% if fornecedor_selected %}selected{% endif %}>Fornecedor</option>
+                <option value="produto" {% if produto_selected %}selected{% endif %}>Produto</option>
+                <option value="periodo" {% if ano_selected %}selected{% endif %}>Periodo</option>
+            </select>
+        </div>
+
+        <div id="fornecedor-filter" {% if fornecedor_selected %}{% else %}style="display: none"{% endif %}>
+
+            <label>Fornecedor:</label>
+            <select name="fornecedor" id="fornecedor">
+                <option value="all">-- Todos --</option>
+                {% for f in fornecedores %}
+                    {% if fornecedor_selected and fornecedor_selected.id == f.id %}
+                        <option value="{{ f.id }}" selected>{{ f.nome }}</option>
+                    {% else %}
+                        <option value="{{ f.id }}">{{ f.nome }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="produto-filter" {% if produto_selected %}{% else %}style="display: none"{% endif %}>
+            <label>Produto:</label>
+            <select name="produto" id="produto">
+                <option value="all">-- Todos --</option>
+                {% for p in produtos %}
+                    {% if produto_selected and produto_selected.id == p.id %}
+                        <option value="{{ p.id }}" selected>{{ p.nome }}</option>
+                    {% else %}
+                        <option value="{{ p.id }}">{{ p.nome }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div id="data-ano-filter" {% if ano_selected %}{% else %}style="display: none"{% endif %}>
+            <label>Ano:</label>
+            <select name="periodo-ano" id="periodo-ano">
+                <option value="all">-- Todos --</option>
+                {% for a in anos %}
+                    {% if ano_selected and ano_selected == a %}
+                        <option value="{{ a }}" selected>{{ a }}</option>
+                    {% else %}
+                        <option value="{{ a }}">{{ a }}</option>
+                    {% endif %}
+
+                {% endfor %}
+            </select>
+        </div>
+        <div id="data-filter" {% if ano_selected %}{% else %}style="display: none"{% endif %}>
+            <label>Mês:</label>
+            <select name="periodo-mes" id="periodo-mes">
+                <option value="all" {% if mes_selected == "all" %}selected{% endif %}>-- Todos --</option>
+                {% for mes_num, mes_nome in meses %}
+                    {% if mes_selected and mes_selected == mes_num %}
+                        <option value="{{ mes_num }}" selected>{{ mes_nome }}</option>
+                    {% else %}
+                        <option value="{{ mes_num }}">{{ mes_nome }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+    </div>
+</form>

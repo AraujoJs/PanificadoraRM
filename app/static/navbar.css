@@ -1,27 +1,137 @@
+:root {
+    --nav-bg: #ED8B15;
+    --nav-text: #ffffff;
+    --hover-bg: rgba(100, 100, 100, 0.27);
+    --heading-color: #AF650C;
+    --link-color: #ED8B15;
+    --logout-color: #AF650C;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --nav-bg: #ff9f1a;
+        --nav-text: #1a1a1a;
+        --hover-bg: rgba(255, 255, 255, 0.15);
+        --heading-color: #ffa733;
+        --link-color: #ff9f1a;
+        --logout-color: #8a4e00;
+    }
+}
+
+/* nav em tela grande: linha normal */
 nav {
-    background-color: #181818;
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
     padding: 10px 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: space-between;
     border-radius: 8px;
     margin-bottom: 20px;
+    flex-wrap: wrap; /* ajuda na responsividade */
+}
+
+/* Cabeçalho: ☰ e logout */
+.menu-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Container do menu de navegação */
+.menu-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Menu de links */
+.menu {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Botão ☰ */
+.menu-toggle {
+    display: none;
+    font-size: 1.5rem;
+    color: var(--nav-text);
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 nav a {
-    color: #ffffff;
+    color: var(--nav-text);
     text-decoration: none;
-    margin: 0 10px;
-    padding: 6px 12px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+    padding: 0.5rem;
+    font-weight: bolder;
 }
 
 nav a:hover {
-    background-color: rgba(100, 100, 100, 0.27);
+    background-color: var(--hover-bg);
+    border-radius: 6px;
 }
 
 .link-logout {
-    color: #5e7afa;
+    font-weight: bold;
+    padding: 0.5rem;
+}
+
+.link-logout:hover {
+    background-color: transparent;
+}
+
+/* Botão logout */
+.container-link-logout {
+    display: flex;
+    align-items: center;
+}
+
+h1, h2 {
+    color: var(--heading-color);
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    nav {
+        align-items: flex-start;
+    }
+
+    .menu-header {
+        flex-direction: row; /* já está correto */
+        justify-content: space-between; /* garante botão ☰ à esquerda, logout à direita */
+        align-items: center;
+        width: 100%;
+    }
+
+    .menu {
+        width: 100%;
+        flex-direction: column;
+        display: none;
+    }
+
+    .menu.active {
+        display: flex;
+    }
+
+    .container-link-logout {
+        width: auto; /* ← ESSENCIAL: não deixar 100% aqui! */
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0; /* removido o espaçamento extra */
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav a {
+        width: 100%;
+    }
 }

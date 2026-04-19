@@ -1,0 +1,56 @@
+{% macro flecha(coluna) -%}
+    {% if ordenar == coluna %}
+        {{ '↓' if ordem == 'desc' else '↑' }}
+    {% endif %}
+{%- endmacro %}
+
+<h2>Produtos cadastrados</h2>
+<div class="table-responsive">
+    <table>
+    <thead>
+    <tr>
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'id' else 'asc' %}
+        <th style="width: 40px"><a href="{{ url_for('interno.produtos', ordenar='id', ordem=proxima_ordem) }}">Id {{ flecha('id') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'nome' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='nome', ordem=proxima_ordem) }}">Nome {{ flecha('nome') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'tipo' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='tipo', ordem=proxima_ordem) }}">Tipo {{ flecha('tipo') }}</a>
+        </th>
+
+        {% set proxima_ordem = 'desc' if ordem == 'asc' and ordenar == 'fornecedor' else 'asc' %}
+        <th>
+            <a href="{{ url_for('interno.produtos', ordenar='fornecedor', ordem=proxima_ordem) }}">Fornecedor {{ flecha('fornecedor') }}</a>
+        </th>
+
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for i in itens %}
+        {% if i.ativo %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td><strong>{{ i.nome }}</strong></td>
+                <td>{{ i.tipo }}</td>
+                <td><em>{{ i.fornecedor }}</em></td>
+                <td style="text-align: right">
+                    <a class="space-end-icon" href="{{ url_for('interno.produto_delete', produto_id=i.id) }}"
+                       onclick="return confirm('Tem certeza que deseja excluir esta compra?')">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    <a class="space-end-icon" href="{{ url_for('interno.produto_update', produto_id=i.id) }}">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+</div>

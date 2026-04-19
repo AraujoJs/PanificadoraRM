@@ -1,0 +1,52 @@
+{% extends 'layout_interno.html' %}
+{% block title %} {{ super() }} - Produtos{% endblock %}
+{% block main %}
+
+    {% if mode == 'add' %}
+        <h2>Adicionar um fornecedor</h2>
+        <form method="POST" action="/interno/compras/fornecedor/add">
+            <input type="hidden" name="endpoint" id="endpoint" value="{{ endpoint }}">
+            <fieldset>
+                <legend>Informations sobre o fornecedor</legend>
+
+                <label>Nome<input type="text" name="nome" id="nome" required></label>
+                <br>
+                <label>Contato<input type="text" name="contato" id="contato" placeholder="(00)00000-0000"/></label>
+                <br>
+                <label>Categoria
+                    <select name="categoria" id="categoria">
+                        {% for c in categorias %}
+                            <option value="{{ c.id }}">{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </fieldset>
+            <br>
+            <button>Adicionar</button>
+        </form>
+    {% elif mode == "update" %}
+        <h2>Atualizar fornecedor n° {{ fornecedor.id }}</h2>
+        <form method="POST" action="/interno/compras/fornecedores/update/{{ fornecedor.id }}">
+            <input type="hidden" name="fornecedor_id" value="{{ fornecedor.id }}">
+            <label>Nome<input type="text" name="nome" id="nome" value="{{ fornecedor.nome }}" required></label>
+            <br>
+            <label>Contato<input type="text" name="contato" id="contato" placeholder="(00)00000-0000"
+                                 value="{{ fornecedor.contato }}"/></label>
+            <br>
+            <label>Categoria
+                <select name="categoria" id="categoria">
+                    {% for c in categorias %}
+                        <option value="{{ c.id }}" {% if c.nome == fornecedor.categoria %}selected{% endif %}>
+                            {{ c.nome }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <br>
+            <button>Adicionar</button>
+        </form>
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/add.js') }}"></script>
+    <script src="https://unpkg.com/imask"></script>
+
+{% endblock %}
