@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
+    <title>Panificadora-RM</title>
+</head>
+<body>
+<div>
+<div id="login-logo-container">
+    <div>
+        <img id="login-logo" src="{{ url_for('static', filename='assets/icon/logo-prm.png') }}">
+    </div>
+    <div class="login-container">
+        <h2>Encontrar sua conta</h2>
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="text" name="username" placeholder="Email" required>
+            <button class="button-send" type="submit">Entrar</button>
+            <button class="button-reset" type="reset" onclick="history.back()">Cancelar</button>
+        </form>
+    </div>
+    </div>
+</div>
+
+
+</body>
+</html>

@@ -1,29 +1,32 @@
-version: '3.8'
-
 services:
   web:
     build: .
     container_name: panificadorarm_web
     restart: always
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     environment:
-      - DATABASE_URL=postgresql://postgres:SenhaSuperForte123!@db:5432/panificadorarm_db
-      - SECRET_KEY=minha_chave_secreta_super_segura_aqui_para_a_panificadora_producao
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - VIRTUAL_PORT=5000
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - app_net
+      - proxy_net
 
   db:
     image: postgres:15-alpine
     container_name: panificadorarm_db
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=SenhaSuperForte123!
-      - POSTGRES_DB=panificadorarm_db
-    ports:
-      - "5432:5432"
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -31,6 +34,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app_net
 
 volumes:
   pgdata:
+
+networks:
+  app_net:
+    driver: bridge
+  proxy_net:
+    external: true

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
+    <title>Panificadora-RM</title>
+</head>
+<body>
+<div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ url_for('static', filename='icon.png') }}" alt="PanificadoraRM Logo" style="width: 130px; height: auto;">
+</div>
+<div class="login-container">
+    <h2>Entrar</h2>
+    <form id="login-form">
+        {% if message %}
+            <p class="error-message">{{ message }}</p>
+        {% endif %}
+        <input type="text" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Senha" required>
+        <button class="button-send" type="submit">Entrar</button>
+    </form>
+    <div class="links">
+        <a href="{{ url_for('auth.login_indentify') }}">Esqueci a senha</a>
+        <span> | </span>
+        <span>Não tem conta? </span><a href="{{ url_for('auth.register') }}">Cadastre-se</a>
+    </div>
+</div>
+
+<footer class="login-footer">
+    <p>© 2026 JBC Software — v1.0</p>
+</footer>
+
+<script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = e.target;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+            const res = await fetch("/auth/entrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({email, password}),
+            });
+
+            const data = await res.json();
+
+            const errorMessage = document.querySelector(".error-message");
+
+            if (res.ok) {
+                sessionStorage.setItem("token", data.token);
+                window.location.href = "/inicio";
+            } else {
+                if (errorMessage) {
+                    errorMessage.textContent = data.message || "Login falhou.";
+                } else {
+                    alert(data.message || "Login falhou."); // fallback
+                }
+            }
+
+        } catch (err) {
+            alert("Erro ao se conectar com o servidor.");
+            console.error(err)
+        }
+    });
+</script>
+</body>
+</html>
