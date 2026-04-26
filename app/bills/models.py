@@ -6,7 +6,7 @@ Controle de Contas a Pagar da padaria.
 import uuid
 from datetime import date
 from sqlalchemy import UUID
-from app import db
+from app.extensions import db
 
 
 class Bill(db.Model):

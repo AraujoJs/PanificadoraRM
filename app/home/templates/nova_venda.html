@@ -1,0 +1,256 @@
+{% extends 'layout.html' %}
+{% block title %}Nova Venda — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header">
+    <h1>Nova Venda</h1>
+    <p class="page-subtitle">Selecione os produtos e finalize a venda</p>
+</div>
+
+<div class="venda-grid">
+
+    <!-- Painel Esquerdo: Catálogo de Produtos -->
+    <div class="card">
+        <h2 class="card-title">🛍️ Produtos Disponíveis</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Qtd</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr id="row-{{ p.product_id }}" class="{% if p.stock == 0 %}row-disabled{% endif %}">
+                    <td>{{ p.name }}</td>
+                    <td>R$ {{ "%.2f" | format(p.unit_price | float) }}</td>
+                    <td>
+                        <span class="badge {% if p.stock <= 5 %}badge-warning{% else %}badge-ok{% endif %}">
+                            {{ p.stock }}
+                        </span>
+                    </td>
+                    <td>
+                        <input type="number" id="qty-{{ p.product_id }}" value="1" min="1"
+                               max="{{ p.stock }}" class="qty-input"
+                               {% if p.stock == 0 %}disabled{% endif %}>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                onclick="adicionarItem('{{ p.product_id }}', '{{ p.name }}', {{ p.unit_price | float }}, {{ p.stock }})"
+                                {% if p.stock == 0 %}disabled{% endif %}>
+                            + Adicionar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Painel Direito: Carrinho -->
+    <div class="card">
+        <h2 class="card-title">🛒 Carrinho</h2>
+
+        <div id="carrinho-vazio" class="empty-state">
+            <p>Nenhum item adicionado ainda.</p>
+        </div>
+
+        <table class="table" id="tabela-carrinho" style="display:none">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Qtd</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="carrinho-body">
+            </tbody>
+        </table>
+
+        <div class="carrinho-footer" id="carrinho-footer" style="display:none">
+            <div class="total-row">
+                <span>Total:</span>
+                <span class="total-valor" id="total-valor">R$ 0,00</span>
+            </div>
+
+            <div class="form-group">
+                <label>Método de Pagamento</label>
+                <select id="payment-method" class="select-input">
+                    <option value="Dinheiro">💵 Dinheiro</option>
+                    <option value="Pix">📱 Pix</option>
+                    <option value="Debito">💳 Débito</option>
+                    <option value="Credito">💳 Crédito</option>
+                </select>
+            </div>
+
+            <button class="btn btn-success btn-block" onclick="finalizarVenda()">
+                ✅ Finalizar Venda
+            </button>
+            <button class="btn btn-danger btn-block" onclick="limparCarrinho()">
+                🗑️ Limpar Carrinho
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast de feedback -->
+<div id="toast" class="toast"></div>
+
+<script>
+    const carrinho = {}; // { product_id: { name, unit_price, quantity, stock } }
+
+    function adicionarItem(productId, name, unitPrice, stock) {
+        const qtyInput = document.getElementById('qty-' + productId);
+        const qty = parseInt(qtyInput.value);
+
+        if (isNaN(qty) || qty <= 0) {
+            showToast('Quantidade inválida.', 'error');
+            return;
+        }
+
+        const jaNoCarrinho = carrinho[productId] ? carrinho[productId].quantity : 0;
+        if (jaNoCarrinho + qty > stock) {
+            showToast(`Estoque insuficiente para "${name}". Disponível: ${stock - jaNoCarrinho}`, 'error');
+            return;
+        }
+
+        if (carrinho[productId]) {
+            carrinho[productId].quantity += qty;
+        } else {
+            carrinho[productId] = { name, unit_price: unitPrice, quantity: qty, stock };
+        }
+
+        atualizarTabela();
+        showToast(`"${name}" adicionado ao carrinho!`, 'success');
+        qtyInput.value = 1;
+    }
+
+    function removerItem(productId) {
+        delete carrinho[productId];
+        atualizarTabela();
+    }
+
+    function atualizarTabela() {
+        const ids = Object.keys(carrinho);
+        const vazio = document.getElementById('carrinho-vazio');
+        const tabela = document.getElementById('tabela-carrinho');
+        const footer = document.getElementById('carrinho-footer');
+        const tbody = document.getElementById('carrinho-body');
+
+        if (ids.length === 0) {
+            vazio.style.display = '';
+            tabela.style.display = 'none';
+            footer.style.display = 'none';
+            return;
+        }
+
+        vazio.style.display = 'none';
+        tabela.style.display = '';
+        footer.style.display = '';
+
+        tbody.innerHTML = '';
+        let total = 0;
+
+        ids.forEach(pid => {
+            const item = carrinho[pid];
+            const subtotal = item.unit_price * item.quantity;
+            total += subtotal;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.name}</td>
+                <td>
+                    <input type="number" value="${item.quantity}" min="1" max="${item.stock}"
+                           onchange="alterarQuantidade('${pid}', this.value)"
+                           class="qty-input qty-input-sm">
+                </td>
+                <td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="removerItem('${pid}')">✕</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('total-valor').textContent =
+            'R$ ' + total.toFixed(2).replace('.', ',');
+    }
+
+    function alterarQuantidade(productId, novaQty) {
+        const qty = parseInt(novaQty);
+        const item = carrinho[productId];
+        if (!item || isNaN(qty) || qty <= 0) return;
+        if (qty > item.stock) {
+            showToast(`Estoque máximo: ${item.stock}`, 'error');
+            return;
+        }
+        item.quantity = qty;
+        atualizarTabela();
+    }
+
+    function limparCarrinho() {
+        Object.keys(carrinho).forEach(k => delete carrinho[k]);
+        atualizarTabela();
+    }
+
+    async function finalizarVenda() {
+        const ids = Object.keys(carrinho);
+        if (ids.length === 0) {
+            showToast('Carrinho vazio!', 'error');
+            return;
+        }
+
+        const payment_method = document.getElementById('payment-method').value;
+        const items = ids.map(pid => ({
+            product_id: pid,
+            quantity: carrinho[pid].quantity
+        }));
+
+        const btn = document.querySelector('.btn-success');
+        btn.disabled = true;
+        btn.textContent = 'Processando...';
+
+        try {
+            const token = sessionStorage.getItem('token');
+            const res = await fetch('/api/v1/vendas/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ payment_method, items })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                showToast(`✅ Venda finalizada! Total: R$ ${data.total.toFixed(2).replace('.', ',')}`, 'success');
+                limparCarrinho();
+                // Recarrega página após 1.5s para atualizar estoque
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                showToast(data.message || 'Erro ao finalizar venda.', 'error');
+            }
+        } catch (err) {
+            showToast('Erro ao conectar com o servidor.', 'error');
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '✅ Finalizar Venda';
+        }
+    }
+
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast toast-' + type + ' toast-show';
+        setTimeout(() => { toast.className = 'toast'; }, 3500);
+    }
+</script>
+
+{% endblock %}

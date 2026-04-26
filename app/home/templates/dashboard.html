@@ -1,0 +1,141 @@
+{% extends 'layout.html' %}
+{% block title %}Dashboard — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="page-subtitle">Visão geral das compras e materiais da padaria</p>
+</div>
+
+<!-- Cards de resumo -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="stat-card">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-value">{{ total_compras }}</div>
+        <div class="stat-label">Total de Compras</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💸</div>
+        <div class="stat-value" style="font-size:1.3rem">R$ {{ total_gasto | currency }}</div>
+        <div class="stat-label">Gasto em Compras</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💳</div>
+        <div class="stat-value" style="font-size:1.3rem">R$ {{ total_contas_pagas | currency }}</div>
+        <div class="stat-label">Total em Contas Pagas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">{{ total_materiais }}</div>
+        <div class="stat-label">Materiais Cadastrados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🏭</div>
+        <div class="stat-value">{{ total_fornecedores }}</div>
+        <div class="stat-label">Fornecedores</div>
+    </div>
+</div>
+
+<!-- Contas a Pagar Resumo -->
+<div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid {% if contas_vencidas %}var(--danger){% elif contas_pendentes %}var(--warning){% else %}var(--primary){% endif %}">
+    <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem">
+        <div>
+            <h3 style="margin: 0; display:flex; align-items: center; gap: 0.5rem; font-size: 1.2rem">
+                💳 Contas a Pagar
+                {% if contas_vencidas %}
+                    <span class="badge badge-danger">{{ contas_vencidas|length }} Vencidas (R$ {{ total_vencido | currency }})</span>
+                {% endif %}
+                {% if contas_pendentes %}
+                    <span class="badge badge-warning">{{ contas_pendentes|length }} Pendentes (R$ {{ total_pendente | currency }})</span>
+                {% endif %}
+                {% if not contas_vencidas and not contas_pendentes %}
+                    <span class="badge badge-primary">Tudo em dia 🎉</span>
+                {% endif %}
+            </h3>
+        </div>
+        <a href="{{ url_for('home.contas_a_pagar') }}" class="btn btn-sm">Acessar Contas →</a>
+    </div>
+</div>
+
+<div class="relatorio-grid">
+
+    <!-- Últimas compras -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <h2 class="card-title" style="margin-bottom:0;border:none;padding:0">🕒 Últimas Compras</h2>
+            <a href="{{ url_for('home.stock_entries') }}" class="btn btn-sm" style="background:var(--bg-hover);color:var(--text-muted)">Ver todas →</a>
+        </div>
+        {% if ultimas_compras %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fornecedor</th>
+                    <th>Data</th>
+                    <th>Custo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in ultimas_compras %}
+                <tr>
+                    <td><strong>{{ e.supplier.name }}</strong></td>
+                    <td style="color:var(--text-muted);font-size:0.82rem">{{ e.entry_date.strftime('%d/%m/%Y') if e.entry_date else '—' }}</td>
+                    <td><strong style="color:var(--accent)">R$ {{ e.total_cost | currency }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <p>Nenhuma compra registrada.</p>
+            <a href="{{ url_for('home.nova_entrada') }}" class="btn btn-primary" style="margin-top:1rem">＋ Registrar Compra</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Estoque baixo -->
+    <div class="card">
+        <h2 class="card-title">⚠️ Estoque Baixo</h2>
+        {% if estoque_baixo %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Unidade</th>
+                    <th>Qtd. em Estoque</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in estoque_baixo %}
+                <tr>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td style="color:var(--text-muted)">{{ p.unit_of_measure }}</td>
+                    <td>
+                        <span class="badge {% if p.stock == 0 %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ p.stock }} {{ p.unit_of_measure }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state" style="padding:1.5rem">
+            <p style="color:var(--accent)">✅ Todos os materiais com estoque adequado!</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Ações rápidas -->
+<div class="card" style="margin-top:1.5rem">
+    <h2 class="card-title">⚡ Ações Rápidas</h2>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a href="{{ url_for('home.nova_entrada') }}" class="btn btn-primary">＋ Nova Compra</a>
+        <a href="{{ url_for('home.suppliers') }}" class="btn" style="background:var(--bg-hover);color:var(--text)">🏭 Gerenciar Fornecedores</a>
+        <a href="{{ url_for('home.products') }}" class="btn" style="background:var(--bg-hover);color:var(--text)">📦 Gerenciar Materiais</a>
+        <a href="{{ url_for('home.relatorio') }}" class="btn" style="background:var(--bg-hover);color:var(--text)">📊 Ver Relatório de Gastos</a>
+    </div>
+</div>
+
+{% endblock %}

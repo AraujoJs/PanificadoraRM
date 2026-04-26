@@ -1,0 +1,72 @@
+{% extends 'layout.html' %}
+{% block title %}Entradas de Estoque — PanificadoraRM{% endblock %}
+{% block main %}
+
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+    <div>
+        <h1>Entradas de Estoque</h1>
+        <p class="page-subtitle">Histórico de compras e reposições de estoque</p>
+    </div>
+    {% if user.role == 'admin' %}
+    <a href="{{ url_for('home.nova_entrada') }}" class="btn btn-success">＋ Nova Entrada</a>
+    {% endif %}
+</div>
+
+{% if entries %}
+{% for entry in entries %}
+<div class="card" style="margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem">
+        <div>
+            <div style="font-weight:600;font-size:1rem;color:var(--text)">
+                🏭 {{ entry.supplier.name }}
+            </div>
+            <div style="color:var(--text-muted);font-size:0.82rem;margin-top:0.2rem">
+                {{ entry.entry_date.strftime('%d/%m/%Y às %H:%M') if entry.entry_date else '—' }}
+                {% if entry.note %}· {{ entry.note }}{% endif %}
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--accent)">
+                R$ {{ entry.total_cost | currency }}
+            </div>
+            <div style="color:var(--text-muted);font-size:0.78rem">custo total</div>
+        </div>
+    </div>
+
+    <table class="table" style="margin-top:1rem">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Quantidade Adicionada</th>
+                <th>Custo Unitário</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entry.items %}
+            <tr>
+                <td><strong>{{ item.product.name }}</strong></td>
+                <td><span class="badge badge-ok">+ {{ item.quantity }} un.</span></td>
+                <td>R$ {{ item.unit_cost | currency }}</td>
+                <td><strong>R$ {{ item.subtotal | currency }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <p>Nenhuma entrada de estoque registrada ainda.</p>
+        {% if user.role == 'admin' %}
+        <a href="{{ url_for('home.nova_entrada') }}" class="btn btn-success" style="margin-top:1rem">
+            ＋ Registrar Primeira Entrada
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

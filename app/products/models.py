@@ -12,6 +12,7 @@ class Product(db.Model):
     unit_of_measure = db.Column(db.Text, nullable=False, default="un")
     unit_price = db.Column(db.Numeric, nullable=True)
     stock = db.Column(db.Integer, nullable=False, default=0)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     supplier_id = db.Column(UUID(as_uuid=True), db.ForeignKey("suppliers.supplier_id"), nullable=True)
 
     supplier = db.relationship("Supplier", backref="products")
